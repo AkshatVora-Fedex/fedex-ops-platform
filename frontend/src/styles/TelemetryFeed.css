@@ -1,0 +1,407 @@
+.telemetry-feed-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .telemetry-feed-container {
+  background: #1f2937;
+}
+
+.telemetry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  color: white;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-left .material-icons {
+  font-size: 28px;
+}
+
+.header-left h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.live-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.live-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.live-toggle.active {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.telemetry-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.dark .telemetry-stats {
+  background: #111827;
+  border-bottom-color: #374151;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .stat-card {
+  background: #1f2937;
+}
+
+.stat-icon {
+  font-size: 32px;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.dark .stat-value {
+  color: #F9FAFB;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.dark .stat-label {
+  color: #9CA3AF;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #F3F4F6;
+  border-bottom: 1px solid #E5E7EB;
+  overflow-x: auto;
+}
+
+.dark .filter-bar {
+  background: #111827;
+  border-bottom-color: #374151;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dark .filter-button {
+  background: #1f2937;
+  border-color: #374151;
+  color: #D1D5DB;
+}
+
+.filter-button:hover {
+  background: #F9FAFB;
+  border-color: #3B82F6;
+}
+
+.dark .filter-button:hover {
+  background: #374151;
+}
+
+.filter-button.active {
+  background: #3B82F6;
+  color: white;
+  border-color: #3B82F6;
+}
+
+.filter-button .material-icons {
+  font-size: 18px;
+}
+
+.telemetry-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #F9FAFB;
+}
+
+.dark .telemetry-stream {
+  background: #0F172A;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9CA3AF;
+}
+
+.empty-state .material-icons {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.empty-hint {
+  font-size: 13px;
+}
+
+.data-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.telemetry-entry {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  animation: slideIn 0.3s ease-out;
+}
+
+.dark .telemetry-entry {
+  background: #1f2937;
+}
+
+.telemetry-entry:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(4px);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.entry-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.entry-icon .material-icons {
+  font-size: 24px;
+  color: white;
+}
+
+.entry-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entry-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dark .entry-name {
+  color: #F9FAFB;
+}
+
+.entry-time {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-family: 'Courier New', monospace;
+}
+
+.entry-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entry-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3B82F6;
+}
+
+.dark .entry-value {
+  color: #60A5FA;
+}
+
+.entry-unit {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.entry-status {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.entry-status.normal {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.entry-status.warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.entry-status.critical {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.dark .entry-status.normal {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6EE7B7;
+}
+
+.dark .entry-status.warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FCD34D;
+}
+
+.dark .entry-status.critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+}
+
+.telemetry-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #F3F4F6;
+  border-top: 1px solid #E5E7EB;
+}
+
+.dark .telemetry-footer {
+  background: #111827;
+  border-top-color: #374151;
+}
+
+.footer-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.dark .footer-item {
+  color: #9CA3AF;
+}
+
+.footer-item .material-icons {
+  font-size: 16px;
+}
+
+.live-indicator {
+  color: #10B981 !important;
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #10B981;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}

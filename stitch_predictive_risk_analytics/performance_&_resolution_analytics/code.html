@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Performance &amp; Resolution Analytics | FedEx P&amp;E</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#590da5",
+                        "secondary": "#ff6200",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0f0814",
+                        "card-dark": "#191022",
+                        "border-dark": "#302839",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #191022;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #302839;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-border-dark px-6 py-3 bg-white dark:bg-card-dark sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">FedEx <span class="text-primary">P&amp;E</span></h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-primary text-sm font-semibold border-b-2 border-primary py-1" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Live Network</a>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Inventory</a>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Hub Performance</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border-none bg-slate-100 dark:bg-border-dark text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none" placeholder="Search hubs, shipments..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-border-dark hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-white">notifications</span>
+</button>
+<button class="p-2 rounded-lg bg-slate-100 dark:bg-border-dark hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-white">settings</span>
+</button>
+</div>
+<div class="h-8 w-px bg-slate-200 dark:border-border-dark mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold dark:text-white">Alex Chen</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider">Sr. Operations Mgr</p>
+</div>
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional avatar of a male operations manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgih3HLPYJXibMKj31PDIlUS6l8dWlymnFDCXG1O3YN7rsgO5RmLEmSDtVdoSfJIdPocrXY1LzSCSmBUA1vFZqpX-gBLGuImCZVBO1wRy70OChY8eqGhMkAgwemk0bxR851ttQ6QxS7ZIYi9VVIwG99_AUCiYT3o7x4kJtpPjw6uqacXRcAi7jsALKR9wzog7JyYCfabmnOM4hARx6WyklbEWM0Dl_6pWtl9PVxCi8ePyle6GJFu6sXpEcM6YHm0X57_rBUTjme9kk"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-border-dark bg-white dark:bg-background-dark p-4 hidden lg:flex flex-col gap-8">
+<div>
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-3">Main Menu</h3>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-display">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-card-dark transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-display">Performance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-card-dark transition-colors" href="#">
+<span class="material-symbols-outlined">rule</span>
+<span class="text-sm font-display">Resolution Hub</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-card-dark transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-sm font-display">Geography</span>
+</a>
+</nav>
+</div>
+<div>
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 px-3">System Alerts</h3>
+<div class="space-y-3 px-3">
+<div class="p-3 rounded-lg bg-secondary/10 border border-secondary/20">
+<div class="flex items-center gap-2 text-secondary mb-1">
+<span class="material-symbols-outlined text-sm">warning</span>
+<span class="text-[11px] font-bold uppercase">Memphis Hub</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-300 leading-tight">Congestion alert: Delay forecast +14m</p>
+</div>
+<div class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+<div class="flex items-center gap-2 text-blue-500 mb-1">
+<span class="material-symbols-outlined text-sm">info</span>
+<span class="text-[11px] font-bold uppercase">System Update</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-300 leading-tight">AI Resolution engine v2.4 live</p>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<div class="bg-gradient-to-br from-primary to-primary/80 p-4 rounded-xl text-white">
+<p class="text-xs font-medium opacity-80 mb-1">Need assistance?</p>
+<p class="text-sm font-bold mb-3 leading-snug">Engineering Support is online.</p>
+<button class="w-full py-2 bg-white text-primary text-xs font-bold rounded-lg hover:bg-opacity-90 transition-colors">Open Chat</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-8 space-y-8">
+<!-- Page Heading -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h1 class="text-slate-900 dark:text-white text-3xl font-black leading-tight tracking-tight">Performance &amp; Resolution Report</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Proactive shipment delay and logistics failure analysis • <span class="text-primary font-bold italic">Real-time Feed</span></p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark text-slate-600 dark:text-white text-sm font-bold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+                        Last 30 Days
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-lg">ios_share</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider">Resolution Rate</p>
+<span class="p-2 bg-emerald-500/10 text-emerald-500 rounded-lg material-symbols-outlined">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-none">94.2%</p>
+<p class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +2.1%
+                        </p>
+</div>
+<p class="text-slate-400 text-xs mt-4">Proactive intervention success vs target 92.0%</p>
+</div>
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider">Avg. Time to Resolve (MTTR)</p>
+<span class="p-2 bg-primary/10 text-primary rounded-lg material-symbols-outlined">history</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-none">1.8 hrs</p>
+<p class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+                            -12%
+                        </p>
+</div>
+<p class="text-slate-400 text-xs mt-4">Mean time for automated redirection triggers</p>
+</div>
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider">Predicted vs. Actual Success</p>
+<span class="p-2 bg-secondary/10 text-secondary rounded-lg material-symbols-outlined">precision_manufacturing</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-none">98.5%</p>
+<p class="text-secondary text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_flat</span>
+                            -0.5%
+                        </p>
+</div>
+<p class="text-slate-400 text-xs mt-4">AI model accuracy for delay prediction</p>
+</div>
+</div>
+<!-- Charts Row -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<!-- Stacked Bar Chart Simulation -->
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark rounded-xl p-6 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Discrepancy Types Over Time</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Volume by category (Last 4 Weeks)</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-primary"></span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Scan Misses</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-secondary"></span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Route Dev</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-indigo-400"></span>
+<span class="text-[10px] text-slate-400 uppercase font-bold">Equip Fault</span>
+</div>
+</div>
+</div>
+<div class="flex items-end justify-between h-64 gap-6 px-4">
+<!-- Week 1 -->
+<div class="flex-1 flex flex-col justify-end gap-1 h-full group relative">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">2,450 units</div>
+<div class="w-full bg-indigo-400 rounded-sm" style="height: 15%"></div>
+<div class="w-full bg-secondary rounded-sm" style="height: 25%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 40%"></div>
+<span class="text-[11px] text-slate-400 font-bold mt-4 text-center">Week 1</span>
+</div>
+<!-- Week 2 -->
+<div class="flex-1 flex flex-col justify-end gap-1 h-full group relative">
+<div class="w-full bg-indigo-400 rounded-sm" style="height: 10%"></div>
+<div class="w-full bg-secondary rounded-sm" style="height: 35%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 50%"></div>
+<span class="text-[11px] text-slate-400 font-bold mt-4 text-center">Week 2</span>
+</div>
+<!-- Week 3 -->
+<div class="flex-1 flex flex-col justify-end gap-1 h-full group relative">
+<div class="w-full bg-indigo-400 rounded-sm" style="height: 20%"></div>
+<div class="w-full bg-secondary rounded-sm" style="height: 20%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 30%"></div>
+<span class="text-[11px] text-slate-400 font-bold mt-4 text-center">Week 3</span>
+</div>
+<!-- Week 4 -->
+<div class="flex-1 flex flex-col justify-end gap-1 h-full group relative">
+<div class="w-full bg-indigo-400 rounded-sm" style="height: 15%"></div>
+<div class="w-full bg-secondary rounded-sm" style="height: 15%"></div>
+<div class="w-full bg-primary rounded-t-sm" style="height: 45%"></div>
+<span class="text-[11px] text-slate-400 font-bold mt-4 text-center">Week 4</span>
+</div>
+</div>
+</div>
+<!-- Geographic Heat Map Simulation -->
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark rounded-xl p-6 shadow-sm overflow-hidden relative">
+<div class="flex justify-between items-center mb-4">
+<div>
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Geographic Failure Density</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Regional hotspot analysis by hub volume</p>
+</div>
+<button class="p-2 rounded-lg bg-slate-50 dark:bg-border-dark text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">zoom_out_map</span>
+</button>
+</div>
+<div class="relative w-full h-64 rounded-lg bg-slate-100 dark:bg-border-dark/50 flex items-center justify-center border border-slate-200 dark:border-border-dark/30">
+<!-- Simulated Map with "Hotspots" -->
+<div class="absolute inset-0 opacity-20 bg-cover bg-center" data-alt="Stylized map of the United States with logistical hub points" data-location="United States" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHVhdCr71tyL3ncO9nU0Y8XBOvVI_6YAYYSk1X2vdITukbclkHi6CeW0qkrk9DLy3whNWa2-sPmU_D4r7iOIV9RArg3-1t_sMXBIzCsdGJkFa3Ch73_klqf0ArMevX7Qd0TlEwkQAbWCLjRWcIttbFBZpka0eNaFTEswPsHNgLfmB4kPQBfSJ2Kt8pWWHm-MM9z-jM6KVr5WYHnKjYclVSJN8_PpT1sNEFHmTa6Kw9ve9ZwDibIl5yoK16A_SPYhqfpn27zGloDn3g')"></div>
+<!-- Pulse Hotspots -->
+<div class="absolute top-1/4 left-1/4 group cursor-pointer">
+<div class="size-6 bg-secondary/40 rounded-full animate-ping"></div>
+<div class="size-3 bg-secondary rounded-full absolute top-1.5 left-1.5 shadow-lg shadow-secondary/50"></div>
+<div class="absolute top-8 left-0 bg-slate-900 text-white p-2 rounded text-[10px] w-24 opacity-0 group-hover:opacity-100 transition-opacity z-10 font-bold">Chicago Hub<br/><span class="text-secondary">High Failure Risk</span></div>
+</div>
+<div class="absolute top-1/2 left-2/3 group cursor-pointer">
+<div class="size-4 bg-primary/40 rounded-full animate-pulse"></div>
+<div class="size-2 bg-primary rounded-full absolute top-1 left-1 shadow-lg shadow-primary/50"></div>
+<div class="absolute top-6 left-0 bg-slate-900 text-white p-2 rounded text-[10px] w-24 opacity-0 group-hover:opacity-100 transition-opacity z-10 font-bold">Memphis SuperHub<br/><span class="text-emerald-400">Operating Normal</span></div>
+</div>
+<div class="absolute bottom-1/3 left-1/2 group cursor-pointer">
+<div class="size-5 bg-secondary/40 rounded-full animate-ping"></div>
+<div class="size-2.5 bg-secondary rounded-full absolute top-1.25 left-1.25 shadow-lg shadow-secondary/50"></div>
+<div class="absolute top-7 left-0 bg-slate-900 text-white p-2 rounded text-[10px] w-24 opacity-0 group-hover:opacity-100 transition-opacity z-10 font-bold">Dallas Metro<br/><span class="text-secondary">Redirection Active</span></div>
+</div>
+<!-- Map Legend -->
+<div class="absolute bottom-2 right-2 bg-white/80 dark:bg-card-dark/80 backdrop-blur-sm p-2 rounded border border-slate-200 dark:border-border-dark flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<div class="h-1.5 w-6 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
+<span class="text-[9px] dark:text-slate-300 font-bold uppercase">Risk Index</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Table Section -->
+<div class="bg-white dark:bg-card-dark border border-slate-200 dark:border-border-dark rounded-xl shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-border-dark flex justify-between items-center">
+<div>
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Top Performing Hubs</h3>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Ranking by proactive resolution and network efficiency</p>
+</div>
+<div class="flex gap-2">
+<button class="text-xs font-bold text-primary px-3 py-1.5 hover:bg-primary/5 rounded-lg transition-colors">View All Hubs</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm border-collapse">
+<thead class="bg-slate-50 dark:bg-border-dark/30 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-black tracking-widest">
+<tr>
+<th class="px-6 py-4">Rank</th>
+<th class="px-6 py-4">Hub / Center</th>
+<th class="px-6 py-4">Region</th>
+<th class="px-6 py-4">Proactive Score</th>
+<th class="px-6 py-4">Resolution MTTR</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-border-dark">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-border-dark/10 transition-colors">
+<td class="px-6 py-4 font-bold dark:text-white">#1</td>
+<td class="px-6 py-4 font-bold dark:text-white">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary font-black text-xs">MEM</div>
+                                        Memphis SuperHub
+                                    </div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">AMER - Central</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-2 bg-slate-100 dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 98%"></div>
+</div>
+<span class="font-bold dark:text-emerald-400">98.2%</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium dark:text-white">1.2h</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-full uppercase">Optimal</span>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-slate-400 hover:text-primary">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-border-dark/10 transition-colors">
+<td class="px-6 py-4 font-bold dark:text-white">#2</td>
+<td class="px-6 py-4 font-bold dark:text-white">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary font-black text-xs">HKG</div>
+                                        Hong Kong Intl
+                                    </div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">APAC - East</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-2 bg-slate-100 dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 95%"></div>
+</div>
+<span class="font-bold dark:text-emerald-400">95.4%</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium dark:text-white">1.4h</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-full uppercase">Optimal</span>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-slate-400 hover:text-primary">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-border-dark/10 transition-colors">
+<td class="px-6 py-4 font-bold dark:text-white">#3</td>
+<td class="px-6 py-4 font-bold dark:text-white">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary font-black text-xs">CDG</div>
+                                        Charles de Gaulle
+                                    </div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">EMEA - Europe</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-2 bg-slate-100 dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 89%"></div>
+</div>
+<span class="font-bold dark:text-primary">89.1%</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium dark:text-white">1.9h</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase">Stable</span>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-slate-400 hover:text-primary">more_horiz</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-border-dark/10 transition-colors">
+<td class="px-6 py-4 font-bold dark:text-white">#4</td>
+<td class="px-6 py-4 font-bold dark:text-white">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary font-black text-xs">EWR</div>
+                                        Newark Liberty
+                                    </div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400">AMER - East</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-2 bg-slate-100 dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 72%"></div>
+</div>
+<span class="font-bold dark:text-secondary">72.3%</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium dark:text-white">3.1h</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full uppercase">Investigating</span>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-slate-400 hover:text-primary">more_horiz</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Footer Branding/Status -->
+<footer class="pt-8 pb-4 flex items-center justify-between border-t border-slate-200 dark:border-border-dark">
+<div class="flex items-center gap-4 text-xs text-slate-400 font-medium">
+<span>© 2024 FedEx Planning &amp; Engineering</span>
+<span class="size-1 bg-slate-400 rounded-full"></span>
+<span>System Status: <span class="text-emerald-500 font-bold">Operational</span></span>
+<span class="size-1 bg-slate-400 rounded-full"></span>
+<span>Last Synced: 2 mins ago</span>
+</div>
+<div class="flex gap-4">
+<a class="text-xs text-primary font-bold hover:underline" href="#">Internal Documentation</a>
+<a class="text-xs text-primary font-bold hover:underline" href="#">API Reference</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

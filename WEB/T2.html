@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedEx OpsPulse | Global Command Center</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Icon Font (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- FedEx Brand Identity --- */
+        :root {
+            --fx-purple: #4D148C;
+            --fx-orange: #FF6600;
+            --fx-bg: #F2F4F8;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fx-bg);
+            color: #333;
+        }
+
+        /* --- Utility Classes --- */
+        .text-fx-purple { color: var(--fx-purple); }
+        .bg-fx-purple { background-color: var(--fx-purple); }
+        .text-fx-orange { color: var(--fx-orange); }
+        .bg-fx-orange { background-color: var(--fx-orange); }
+
+        /* --- Card Components --- */
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-top: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card-purple { border-top-color: var(--fx-purple); }
+        .card-orange { border-top-color: var(--fx-orange); }
+        .card-green { border-top-color: #10B981; }
+        .card-red { border-top-color: #EF4444; }
+
+        /* --- Ticker Animation --- */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: #1F2937;
+            color: white;
+            white-space: nowrap;
+            box-sizing: border-box;
+            height: 32px;
+            display: flex;
+            align-items: center;
+        }
+        .ticker {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* --- Map Styling --- */
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            z-index: 1;
+        }
+        #globalMap { width: 100%; height: 100%; background: #f0f0f0; }
+
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 11px;
+        }
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
+
+        /* --- Markers --- */
+        .hub-icon {
+            background: var(--fx-purple);
+            border: 2px solid white;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            line-height: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .hub-icon.alert { background: #EF4444; animation: pulse-red 2s infinite; }
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="bg-fx-purple text-white shadow-md z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <div class="font-black text-2xl tracking-tighter select-none">
+                    <span class="text-white">Fed</span><span class="text-fx-orange">Ex</span>
+                    <span class="text-xs font-normal text-gray-300 ml-1 tracking-normal opacity-80">OpsPulse</span>
+                </div>
+                <div class="hidden md:flex h-6 w-px bg-purple-700"></div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+		    <a href="file:///C:/Users/9787080/Downloads/WEB/T1.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Shipment Control Tower</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T2.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Global Command</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T3.html#" class="text-purple-300 hover:text-white transition-colors">Shipment Watch</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T4.html#" class="text-purple-300 hover:text-white transition-colors">Hub Health</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="generateBriefing()" class="hidden md:flex items-center px-3 py-1 bg-white/10 hover:bg-white/20 rounded border border-white/20 text-xs font-bold transition-all">
+                    <i class="ph ph-sparkle text-fx-orange mr-2"></i>
+                    Generate Shift Briefing
+                </button>
+                <div class="h-8 w-8 bg-purple-800 rounded flex items-center justify-center border border-purple-600 relative">
+                    <i class="ph ph-bell text-white"></i>
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-purple-900"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Live Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item text-green-400">AMER On-Time: 98.2% <i class="ph ph-trend-up"></i></span>
+            <span class="ticker-item text-yellow-400">EMEA On-Time: 94.1% <i class="ph ph-trend-down"></i> (Weather Impact)</span>
+            <span class="ticker-item text-green-400">APAC On-Time: 99.5% <i class="ph ph-trend-up"></i></span>
+            <span class="ticker-item text-red-400 font-bold">ALERT: Indianapolis Hub (IND) Sort Capacity Critical (94%)</span>
+            <span class="ticker-item">Memphis SuperHub: Operational (78% Load)</span>
+            <span class="ticker-item text-yellow-400">Paris CDG: De-icing in progress (+15m delays)</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 space-y-6">
+
+        <!-- Top Row: Global KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="card card-purple p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Active Volume</p>
+                        <h2 class="text-3xl font-black text-gray-800 mt-1">14.2M</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+2.4%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-red p-4 border-l-4 border-l-red-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Critical Backlog</p>
+                        <h2 class="text-3xl font-black text-red-600 mt-1">342</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded animate-pulse">ACTION REQ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-orange p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Predicted Risk</p>
+                        <h2 class="text-3xl font-black text-fx-orange mt-1">1,205</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">AI Watch</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-green p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Network Health</p>
+                        <h2 class="text-3xl font-black text-green-600 mt-1">98.2%</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">Target Met</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Row: Global Map & Hub Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Global Map (2/3) -->
+            <div class="lg:col-span-2 card p-0 flex flex-col h-[520px] relative">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <div class="flex items-center">
+                        <h3 class="font-bold text-gray-700 text-sm uppercase mr-3">Global Flight Radar</h3>
+                        <span class="flex items-center text-[10px] font-mono text-gray-500 bg-white px-2 py-0.5 rounded border border-gray-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1 animate-pulse"></span> LIVE
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="map-wrapper bg-gray-100">
+                    <div id="globalMap"></div>
+                    
+                    <!-- Map Layer Controls -->
+                    <div class="map-controls">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Layers</p>
+                        <label class="layer-toggle">
+                            <input type="checkbox" checked onchange="toggleLayer('flights')" class="mr-2 text-fx-purple rounded focus:ring-0">
+                            <span>Active Flights</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" checked onchange="toggleLayer('hubs')" class="mr-2 text-fx-purple rounded focus:ring-0">
+                            <span>Key Hubs</span>
+                        </label>
+                        <label class="layer-toggle">
+                            <input type="checkbox" onchange="toggleLayer('weather')" class="mr-2 text-fx-purple rounded focus:ring-0">
+                            <span class="text-red-500 font-bold">Weather Radar</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hub Pulse Grid (1/3) -->
+            <div class="lg:col-span-1 space-y-4 overflow-y-auto h-[520px] pr-1">
+                <div class="flex justify-between items-end pb-2">
+                    <h3 class="font-bold text-gray-700 text-sm uppercase">Key Hub Status</h3>
+                    <span class="text-xs text-gray-400">Live Load Factor</span>
+                </div>
+
+                <!-- Hub Cards -->
+                <div class="card card-purple p-4 group hover:border-l-4 hover:border-l-purple-500 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-black text-gray-800 group-hover:text-fx-purple">Memphis (MEM)</h4>
+                            <p class="text-xs text-gray-500">SuperHub</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded">OPERATIONAL</span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-1.5 rounded-full mb-2"><div class="bg-green-500 h-full rounded-full" style="width: 78%"></div></div>
+                    <p class="text-xs text-gray-500">Load: 78% | Weather: Clear</p>
+                </div>
+
+                <div class="card card-red p-4 border-l-4 border-l-red-500 cursor-pointer shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-black text-gray-800">Indianapolis (IND)</h4>
+                            <p class="text-xs text-gray-500">National Hub</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-bold rounded animate-pulse">CRITICAL</span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-1.5 rounded-full mb-2"><div class="bg-red-500 h-full rounded-full" style="width: 94%"></div></div>
+                    <p class="text-xs text-red-600 font-bold flex items-center"><i class="ph ph-snowflake mr-1"></i> Heavy Snow | Backlog: +45m</p>
+                </div>
+
+                <div class="card card-orange p-4 group hover:border-l-4 hover:border-l-orange-500 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-black text-gray-800 group-hover:text-fx-orange">Paris (CDG)</h4>
+                            <p class="text-xs text-gray-500">EMEA Gateway</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-bold rounded">WARNING</span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-1.5 rounded-full mb-2"><div class="bg-orange-500 h-full rounded-full" style="width: 88%"></div></div>
+                    <p class="text-xs text-gray-500">Load: 88% | Weather: Rain</p>
+                </div>
+                
+                 <div class="card card-green p-4 group hover:border-l-4 hover:border-l-green-500 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-black text-gray-800 group-hover:text-green-600">Guangzhou (CAN)</h4>
+                            <p class="text-xs text-gray-500">APAC Gateway</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded">OPERATIONAL</span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-1.5 rounded-full mb-2"><div class="bg-green-500 h-full rounded-full" style="width: 65%"></div></div>
+                    <p class="text-xs text-gray-500">Load: 65% | Weather: Cloudy</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Row: Regional Breakdown & AI Briefing Modal Placeholder -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card p-5">
+                <h3 class="font-bold text-gray-700 text-sm uppercase mb-4">Regional SLA Performance</h3>
+                <div class="h-48 relative">
+                    <canvas id="regionalChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card p-5 bg-gradient-to-br from-white to-purple-50 border border-purple-100 relative">
+                <div class="absolute top-4 right-4">
+                    <i class="ph ph-brain text-4xl text-purple-200"></i>
+                </div>
+                <h3 class="font-bold text-fx-purple text-sm uppercase mb-2">OpsCommander Briefing</h3>
+                <div id="briefingContent" class="text-sm text-gray-600 leading-relaxed h-40 overflow-y-auto">
+                    <p class="italic text-gray-400 mt-10 text-center">Click "Generate Shift Briefing" in the header to analyze the global network state.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const apiKey = ""; // System provided
+        let map, flightLayer, hubLayer, weatherLayer;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGlobalMap();
+            initRegionalChart();
+        });
+
+        // --- MAP LOGIC ---
+        function initGlobalMap() {
+            try {
+                map = L.map('globalMap', { zoomControl: false, attributionControl: false }).setView([30, -10], 2);
+                L.control.zoom({ position: 'bottomright' }).addTo(map);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 10 }).addTo(map);
+
+                // Layers
+                const hubs = [
+                    { code: 'MEM', coords: [35.149, -90.048], status: 'ok' },
+                    { code: 'IND', coords: [39.768, -86.158], status: 'alert' }, // Alert
+                    { code: 'CDG', coords: [49.009, 2.547], status: 'warn' },
+                    { code: 'DXB', coords: [25.276, 55.296], status: 'ok' },
+                    { code: 'CAN', coords: [23.129, 113.264], status: 'ok' }
+                ];
+                
+                const routes = [
+                    { from: [35.149, -90.048], to: [49.009, 2.547] }, 
+                    { from: [35.149, -90.048], to: [39.768, -86.158] }, 
+                    { from: [49.009, 2.547], to: [25.276, 55.296] },
+                    { from: [25.276, 55.296], to: [23.129, 113.264] }
+                ];
+
+                // 1. Flight Layer
+                flightLayer = L.layerGroup();
+                routes.forEach(r => {
+                    L.polyline([r.from, r.to], { color: '#4D148C', weight: 2, opacity: 0.6, dashArray: '5, 5' }).addTo(flightLayer);
+                });
+                flightLayer.addTo(map);
+
+                // 2. Hub Layer
+                hubLayer = L.layerGroup();
+                hubs.forEach(h => {
+                    const cssClass = h.status === 'alert' ? 'hub-icon alert' : 'hub-icon';
+                    const icon = L.divIcon({
+                        className: 'bg-transparent',
+                        html: `<div class="${cssClass}" style="width:24px; height:24px; line-height:20px;">${h.code}</div>`,
+                        iconSize: [24, 24]
+                    });
+                    L.marker(h.coords, { icon: icon }).addTo(hubLayer);
+                });
+                hubLayer.addTo(map);
+
+                // 3. Weather Layer (Simulated Red Zones)
+                weatherLayer = L.layerGroup();
+                L.circle([39.768, -86.158], { color: 'red', fillColor: '#f03', fillOpacity: 0.3, radius: 400000 }).addTo(weatherLayer); // Storm over Indy
+                L.circle([49.009, 2.547], { color: 'orange', fillColor: '#f93', fillOpacity: 0.3, radius: 250000 }).addTo(weatherLayer); // Rain over Paris
+
+            } catch(e) { console.error("Map Init Failed", e); }
+        }
+
+        function toggleLayer(type) {
+            if(!map) return;
+            if(type === 'flights') {
+                if(map.hasLayer(flightLayer)) map.removeLayer(flightLayer);
+                else map.addLayer(flightLayer);
+            }
+            if(type === 'hubs') {
+                if(map.hasLayer(hubLayer)) map.removeLayer(hubLayer);
+                else map.addLayer(hubLayer);
+            }
+            if(type === 'weather') {
+                if(map.hasLayer(weatherLayer)) map.removeLayer(weatherLayer);
+                else map.addLayer(weatherLayer);
+            }
+        }
+
+        // --- CHART ---
+        function initRegionalChart() {
+            const ctx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Americas', 'EMEA', 'APAC'],
+                    datasets: [{
+                        label: 'On-Time %',
+                        data: [98.2, 94.1, 99.5],
+                        backgroundColor: ['#10B981', '#F59E0B', '#10B981'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 90, max: 100 } }
+                }
+            });
+        }
+
+        // --- AI ---
+        async function generateBriefing() {
+            const box = document.getElementById('briefingContent');
+            box.innerHTML = `<div class="flex items-center text-fx-purple justify-center h-full"><i class="ph ph-spinner animate-spin mr-2"></i> Analyzing Network State...</div>`;
+            
+            const prompt = `You are a FedEx Global Ops Manager.
+            State:
+            1. IND Hub: Critical (94% Load, Snow Storm, +45m delay).
+            2. CDG Hub: Warning (Rain, De-icing, +15m delay).
+            3. AMER Region: Strong (98.2%). EMEA: Struggling (94.1%).
+            
+            Task: Write a 3-bullet executive shift briefing. Format: HTML.`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            try {
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                const json = await res.json();
+                box.innerHTML = `<div class="prose prose-sm text-gray-700">${json.candidates[0].content.parts[0].text}</div>`;
+            } catch (e) {
+                box.innerHTML = `<strong>Shift Briefing:</strong><br><ul class="list-disc pl-4 mt-2"><li><strong>CRITICAL:</strong> Indianapolis (IND) facing severe snowstorm. Sort capacity exceeded (94%). Divert ground volume to ORD immediately.</li><li><strong>WATCH:</strong> Paris (CDG) de-icing operations causing minor delays. EMEA regional performance impacted (-5.9%).</li><li><strong>GOOD:</strong> Americas and APAC regions operating above SLA targets.</li></ul>`;
+            }
+        }
+    </script>
+</body>
+</html>

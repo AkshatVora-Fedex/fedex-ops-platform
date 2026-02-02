@@ -1,0 +1,361 @@
+<html lang="en"><head></head><body class="bg-[var(--bg-main)] h-screen flex flex-col overflow-hidden">```html
+
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Operations Health Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --fedex-purple: #4D148C;
+            --fedex-orange: #FF6600;
+            --bg-main: #F4F4F7;
+            --text-dark: #333333;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-dark);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }.sidebar-select {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.75rem;
+        }
+        .sidebar-select:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            --tw-ring-color: rgba(255, 255, 255, 0.3);
+        }
+        .sidebar-select option {
+            background-color: var(--fedex-purple);
+            color: white;
+        }
+    </style>
+
+
+<header class="bg-[var(--fedex-purple)] shadow-md z-30 flex-shrink-0">
+<div class="px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16">
+<div class="flex items-center">
+<div class="flex-shrink-0 flex items-center bg-white rounded px-2 py-1">
+<img alt="Corporate Logo" class="h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrrMHWKRTXCPkQqxivkdld5tD8vVSRZ0ltVQrgUt9w5ApKv6sgXg1C68JWNzKRjrH5nxkJKuPHyWHyKLTWv6Q78H16MP06ojoAzUkxKg2_eRp3Z0ULfV0lc-b2LdSJ4D4J2RpHxGUiMqt0UjIXWQRJsx1SooQiQ3qIwu323JjKgmEfcrspkp07xgycIEseE1O0_B7No9YfMpvOS4ShWpMHWVpbuvcDEkA6GY3SOeYY98mQ7hAgUZeORwbqgpCrFkvpd9QUiXXbzJeN"/>
+</div>
+<div class="hidden md:block ml-6 border-l border-purple-800 pl-6">
+<div class="text-white text-lg font-bold">Planning &amp; Engineering</div>
+<div class="text-purple-200 text-[10px] font-medium uppercase tracking-widest">Operations Health Dashboard</div>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<button class="p-1 text-purple-200 hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center space-x-3 cursor-pointer group">
+<img alt="User avatar" class="h-8 w-8 rounded-full border-2 border-purple-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzkU_uoW8M3tM25cuGxz7GhnrbQwa3rR3T1XD1o5a-N09znTN9xH7x5mfUkjdje5kiCdyRVoV_OrMp8yiRVYTtfCBG0iRAF43i1mtEIollo2HY_CaKykTOPEnxNQ3GtCnl1UC5JFzm_knpAHlyjpVUDX9YW2ohCFqNsXw8TiCGNZBn56GHw5MbgfGcDjoR_HB5-GmCvVXaalZOXyC4gx2v11b56Sh3ttVwrIuSM3fjXa5g6ymOyz9N5Sbr5otO0xmyzAWWAQqut2UL"/>
+<span class="hidden md:block text-sm font-medium text-white group-hover:text-purple-100">Ops Admin</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-72 bg-[var(--fedex-purple)] flex flex-col overflow-y-auto flex-shrink-0 z-20 shadow-xl border-t border-purple-800">
+<nav class="p-4 space-y-1 border-b border-purple-800/50">
+<a class="flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-white/10 text-white" href="#">
+<span class="material-symbols-outlined mr-4">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-purple-200 hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined mr-4">local_shipping</span>
+                Live Network
+            </a>
+<a class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-purple-200 hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined mr-4">analytics</span>
+                Performance Reports
+            </a>
+</nav>
+<div class="p-5 border-b border-purple-800/50 bg-white/5">
+<h2 class="text-[11px] font-bold text-purple-300 uppercase tracking-widest mb-4 flex items-center">
+<span class="material-symbols-outlined text-sm mr-2">filter_list</span>
+                Dashboard Filters
+            </h2>
+<div class="space-y-4">
+<div>
+<label class="block text-[11px] font-medium text-purple-200 mb-1.5 ml-1">Region</label>
+<select class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
+<option value="">All Regions</option>
+<option value="APAC">APAC (Asia Pacific)</option>
+<option value="EMEA">EMEA (Europe, Mid East)</option>
+<option value="LAC">LAC (LatAm, Caribbean)</option>
+<option value="NA">NA (North America)</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-medium text-purple-200 mb-1.5 ml-1">Service Type</label>
+<div class="space-y-1.5">
+<select class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
+<option value="">All Service Types</option>
+<option value="PO">Priority Overnight</option>
+<option value="IF">International First</option>
+<option value="GR">Ground</option>
+<option value="IP">International Priority</option>
+<option value="SO">Standard Overnight</option>
+</select>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full flex items-center justify-center px-3 py-2 text-[11px] font-bold text-purple-200 hover:text-white hover:bg-white/10 rounded-md transition-colors border border-purple-300/20">
+<span class="material-symbols-outlined text-xs mr-2">layers_clear</span>
+                        Clear Filters
+                    </button>
+</div>
+</div>
+</div>
+<div class="p-5">
+<h2 class="text-[11px] font-bold text-purple-300 uppercase tracking-widest mb-4">Risk Alerts</h2>
+<div class="bg-red-500/10 border-l-4 border-red-500 p-3 mb-3 rounded-r">
+<div class="flex justify-between items-start">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-red-400 text-sm mr-1.5">warning</span>
+<span class="text-xs font-bold text-white">Hub MEM Delay</span>
+</div>
+<span class="text-[10px] text-red-300">2m ago</span>
+</div>
+<p class="text-[11px] text-purple-100 mt-1 leading-relaxed">Severe weather impact projected for inbound flights.</p>
+</div>
+<div class="bg-[var(--fedex-orange)]/10 border-l-4 border-[var(--fedex-orange)] p-3 mb-3 rounded-r">
+<div class="flex justify-between items-start">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[var(--fedex-orange)] text-sm mr-1.5">schedule</span>
+<span class="text-xs font-bold text-white">Sort Capacity</span>
+</div>
+<span class="text-[10px] text-orange-200">15m ago</span>
+</div>
+<p class="text-[11px] text-purple-100 mt-1 leading-relaxed">IND facility reaching 85% capacity threshold.</p>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto p-6 md:p-8">
+<section class="mb-10">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h1 class="text-2xl font-bold text-gray-800">Network Health Summary</h1>
+<p class="text-sm text-gray-500 mt-1">Global operations performance and risk monitoring</p>
+</div>
+<div class="text-xs font-medium text-gray-500 flex items-center bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
+<span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                    Last updated: Just now
+                </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">On-Time Performance</p>
+<p class="text-3xl font-bold text-gray-900 mt-2">98.2%</p>
+</div>
+<span class="material-symbols-outlined text-gray-200 text-4xl">speed</span>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[11px] font-bold text-green-600 flex items-center bg-green-50 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-xs mr-0.5">trending_up</span> 0.4%
+                        </span>
+<span class="text-[10px] text-gray-400">Target: 97.8%</span>
+</div>
+<div class="mt-3 w-full bg-gray-100 rounded-full h-1.5">
+<div class="bg-[var(--fedex-purple)] h-1.5 rounded-full" style="width: 98.2%"></div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Projected Failures</p>
+<p class="text-3xl font-bold text-gray-900 mt-2">1,204</p>
+</div>
+<span class="material-symbols-outlined text-gray-200 text-4xl">report_problem</span>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[11px] font-bold text-red-600 flex items-center bg-red-50 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-xs mr-0.5">trending_up</span> 12%
+                        </span>
+<span class="text-[10px] text-gray-400">MEM Weather Impact</span>
+</div>
+<div class="mt-3 w-full bg-gray-100 rounded-full h-1.5">
+<div class="bg-[var(--fedex-orange)] h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Active Flights</p>
+<p class="text-3xl font-bold text-gray-900 mt-2">642</p>
+</div>
+<span class="material-symbols-outlined text-gray-200 text-4xl">flight_takeoff</span>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[11px] font-medium text-gray-600">/ 650 Scheduled</span>
+<span class="text-[10px] text-red-500 font-bold">8 Delayed &gt; 30m</span>
+</div>
+<div class="mt-3 w-full bg-gray-100 rounded-full h-1.5">
+<div class="bg-blue-500 h-1.5 rounded-full" style="width: 98%"></div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Volume</p>
+<p class="text-3xl font-bold text-gray-900 mt-2">14.2M</p>
+</div>
+<span class="material-symbols-outlined text-gray-200 text-4xl">inventory_2</span>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[11px] font-bold text-green-600 flex items-center bg-green-50 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-xs mr-0.5">check_circle</span> Normal
+                        </span>
+<span class="text-[10px] text-gray-400">Within Threshold</span>
+</div>
+<div class="mt-3 w-full bg-gray-100 rounded-full h-1.5">
+<div class="bg-green-500 h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+</div>
+</div>
+</section>
+<div class="space-y-6">
+<div class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
+<div class="flex-1 relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] focus:border-transparent shadow-sm" placeholder="Search by AWB, Location, or Flight #" type="text"/>
+</div>
+<div class="flex space-x-3">
+<select class="block w-44 pl-3 pr-10 py-2.5 text-sm bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] rounded-lg shadow-sm">
+<option>Status: All</option>
+<option>Status: In Transit</option>
+<option>Status: Delayed</option>
+<option>Status: Held</option>
+</select>
+<button class="inline-flex items-center px-6 py-2.5 bg-[var(--fedex-purple)] hover:bg-[#3d1070] text-white text-sm font-bold rounded-lg shadow-sm transition-colors">
+<span class="material-symbols-outlined text-sm mr-2">refresh</span>
+                        Refresh View
+                    </button>
+</div>
+</div>
+<div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100">
+<div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+<h3 class="text-lg font-bold text-gray-800">Shipment Status &amp; Risk Analysis</h3>
+<div class="flex space-x-2">
+<button class="p-2 text-gray-400 hover:text-[var(--fedex-purple)] hover:bg-gray-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="p-2 text-gray-400 hover:text-[var(--fedex-purple)] hover:bg-gray-100 rounded-lg transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-100">
+<thead class="bg-gray-50/50">
+<tr>
+<th class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest" scope="col">AWB Number</th>
+<th class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest" scope="col">Origin / Dest</th>
+<th class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest" scope="col">Current Status</th>
+<th class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest" scope="col">Predicted Risk</th>
+<th class="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-widest" scope="col">Next Milestone</th>
+<th class="px-6 py-4 relative" scope="col"><span class="sr-only">Actions</span></th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-100">
+<tr class="hover:bg-gray-50/50 transition-colors group">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm font-bold text-[var(--fedex-purple)]">8055-1294-0123</div>
+<div class="text-[11px] text-gray-400 font-medium">Priority Overnight</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-700 flex items-center">
+                                    ORD <span class="material-symbols-outlined text-xs mx-2 text-gray-300">arrow_forward</span> LHR
+                                </div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-orange-100 text-[var(--fedex-orange)]">
+                                    In Transit - Late
+                                </span>
+<div class="text-[11px] text-gray-500 mt-1.5">Departed Chicago, IL</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-2 w-2 rounded-full bg-red-600 mr-2"></div>
+<span class="text-sm font-bold text-red-600">High (92%)</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">Weather Delay (Storm)</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm text-gray-700">Arrive Memphis Hub</div>
+<div class="text-[11px] font-bold text-red-500 mt-0.5">ETA: +4h Delayed</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap text-right">
+<button class="text-sm font-bold text-[var(--fedex-purple)] hover:text-[#3d1070] underline-offset-4 hover:underline">Details</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50/50 transition-colors group">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm font-bold text-[var(--fedex-purple)]">7721-9982-4412</div>
+<div class="text-[11px] text-gray-400 font-medium">Intl Priority</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm font-medium text-gray-700 flex items-center">
+                                    HKG <span class="material-symbols-outlined text-xs mx-2 text-gray-300">arrow_forward</span> CDG
+                                </div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-100 text-blue-700">
+                                    Customs Hold
+                                </span>
+<div class="text-[11px] text-gray-500 mt-1.5">Clearance Pending</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-2 w-2 rounded-full bg-[var(--fedex-orange)] mr-2"></div>
+<span class="text-sm font-bold text-[var(--fedex-orange)]">Medium (45%)</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">Paperwork Review</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="text-sm text-gray-700">Depart Hong Kong</div>
+<div class="text-[11px] font-bold text-green-600 mt-0.5">ETA: On Schedule</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap text-right">
+<button class="text-sm font-bold text-[var(--fedex-purple)] hover:text-[#3d1070] underline-offset-4 hover:underline">Details</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-100">
+<p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                        Showing <span class="text-gray-900">1-10</span> of <span class="text-gray-900">248</span> shipments
+                    </p>
+<nav class="flex space-x-1">
+<button class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-lg bg-[var(--fedex-purple)] text-white text-xs font-bold shadow-md shadow-purple-200">1</button>
+<button class="px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition-colors">2</button>
+<button class="px-3.5 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-xs font-bold hover:bg-gray-50 transition-colors">3</button>
+<span class="px-2 py-1.5 text-gray-400">...</span>
+<button class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

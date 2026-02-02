@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shipment Telemetry &amp; Progress Trace | FedEx Internal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4D148C", // FedEx Purple
+                        secondary: "#FF6600", // FedEx Orange
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#111827",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.375rem",
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 font-body antialiased transition-colors duration-200">
+<nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
+<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center space-x-4">
+<div class="flex-shrink-0 flex items-center">
+<span class="font-bold text-3xl tracking-tighter">Fed<span class="text-secondary">Ex</span></span>
+<span class="ml-4 text-xs font-medium uppercase tracking-wider opacity-70 border-l border-white/30 pl-3">Planning &amp; Engineering</span>
+</div>
+<div class="hidden md:block">
+<div class="ml-10 flex items-baseline space-x-4">
+<a class="bg-white/10 px-3 py-2 rounded-md text-sm font-medium hover:bg-white/20 transition" href="#">Telemetry</a>
+<a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/20 transition" href="#">Route Planner</a>
+<a class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/20 transition" href="#">Network Health</a>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative hidden lg:block">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons text-gray-400 text-lg">search</span>
+</div>
+<input class="block w-64 pl-10 pr-3 py-1.5 border-transparent leading-5 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:bg-white/20 focus:ring-0 rounded-md sm:text-sm transition duration-150 ease-in-out" placeholder="Search AWB or Route ID..." type="text"/>
+</div>
+<div class="flex items-center space-x-3">
+<span class="text-sm font-medium hidden sm:block">Ops Manager</span>
+<div class="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm">JD</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+<div>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+<span class="material-icons text-secondary">local_shipping</span>
+                    Shipment Telemetry: <span class="text-primary dark:text-purple-400 font-mono">AWB-789210455</span>
+</h1>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+<span class="w-2 h-2 mr-1 bg-red-500 rounded-full animate-pulse"></span> DELAY RISK DETECTED
+                    </span>
+<span class="text-gray-400">|</span>
+                    Service: <span class="font-medium text-gray-700 dark:text-gray-300">International Priority</span>
+<span class="text-gray-400">|</span>
+                    Route: <span class="font-medium text-gray-700 dark:text-gray-300">MEM &gt; CDG &gt; DXB</span>
+</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center px-4 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-surface-light dark:bg-surface-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+<span class="material-icons text-sm mr-2">history</span> Audit Log
+                </button>
+<button class="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-purple-800 transition">
+<span class="material-icons text-sm mr-2">notification_important</span> Escalate
+                </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+<h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+<span class="material-icons text-gray-400 text-lg">map</span> Live Route Visualization
+                        </h2>
+<div class="flex items-center space-x-2 text-xs">
+<div class="flex items-center"><span class="w-3 h-1 bg-gray-400 rounded mr-1"></span> Planned Route</div>
+<div class="flex items-center"><span class="w-3 h-1 bg-secondary rounded mr-1"></span> Actual Path</div>
+<div class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span> Live Unit</div>
+</div>
+</div>
+<div class="relative h-96 bg-gray-200 dark:bg-gray-700 w-full group overflow-hidden">
+<div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#6b7280 1px, transparent 1px); background-size: 20px 20px;"></div>
+<img alt="Map view of Europe and Middle East" class="w-full h-full object-cover opacity-60 mix-blend-multiply dark:mix-blend-overlay grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5L2qG5usj0vPzBOOZFzxgf-CTYBmaCMsb2qm4DCkdqK9kuXnoAOdAcssIMn2i21EKbYzItDG1jgKqNMq1TM9n0jukIrFzDVwxtqso-0bEOHC_RJYJ-sTUI820ACZ__eHOfN07ith1aUJ6EE0RlpTsD7Usb9diTZgJpYLTjBnxVu_7xGSgHeM1GwBNYK6KEIOOUQ_8QP49_qu_DMxj457VBcCf9-BQ-f46w2v19ZprVWzDQBJXZloKOYL0nFKWAQWoVfXzswyeVMXk"/>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 10;">
+<path d="M 100 200 Q 300 150 500 180 T 800 250" fill="none" stroke="#9CA3AF" stroke-dasharray="5,5" stroke-width="3"></path>
+<path d="M 100 200 Q 300 160 480 185" fill="none" stroke="#FF6600" stroke-linecap="round" stroke-width="4"></path>
+<circle cx="480" cy="185" fill="#10B981" r="6" stroke="white" stroke-width="2">
+<animate attributeName="r" dur="2s" repeatCount="indefinite" values="6;10;6"></animate>
+<animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="1;0.5;1"></animate>
+</circle>
+<circle cx="100" cy="200" fill="#4B5563" r="4"></circle>
+<text class="text-xs font-bold fill-gray-800 dark:fill-white" x="80" y="220">MEM (Origin)</text>
+<circle cx="800" cy="250" fill="#4B5563" r="4"></circle>
+<text class="text-xs font-bold fill-gray-800 dark:fill-white" x="780" y="270">DXB (Dest)</text>
+</svg>
+<div class="absolute bottom-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur p-3 rounded shadow-lg border border-gray-200 dark:border-gray-700 text-xs w-64">
+<div class="flex justify-between mb-2">
+<span class="text-gray-500 dark:text-gray-400">Current Speed</span>
+<span class="font-mono font-bold text-gray-900 dark:text-white">458 kts</span>
+</div>
+<div class="flex justify-between mb-2">
+<span class="text-gray-500 dark:text-gray-400">Altitude</span>
+<span class="font-mono font-bold text-gray-900 dark:text-white">32,000 ft</span>
+</div>
+<div class="flex justify-between">
+<span class="text-gray-500 dark:text-gray-400">ETA Variance</span>
+<span class="font-mono font-bold text-red-600">+45m (Delay)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+<div class="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+<h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+<span class="material-icons text-gray-400 text-lg">timeline</span> Progress Timeline: Actual vs. Planned
+                        </h2>
+<div class="flex space-x-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                UTC Time Zone
+                            </span>
+</div>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Milestone</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Planned (UTC)</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Actual (UTC)</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Variance</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Status</th>
+</tr>
+</thead>
+<tbody class="bg-surface-light dark:bg-surface-dark divide-y divide-border-light dark:divide-border-dark">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons text-sm">inventory_2</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">PUX</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Pick-up Executed</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">10 OCT 08:00</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono font-medium">10 OCT 08:05</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="text-xs font-medium text-yellow-600 dark:text-yellow-400">+5m</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Completed</span>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons text-sm">flight_takeoff</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">DEP</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Departed MEM Hub</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">10 OCT 14:30</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono font-medium">10 OCT 14:45</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="text-xs font-medium text-yellow-600 dark:text-yellow-400">+15m</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Completed</span>
+</td>
+</tr>
+<tr class="bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition border-l-4 border-red-500">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
+<span class="material-icons text-sm">flight_land</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">ARV</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Arrival CDG Hub</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-mono">11 OCT 02:00</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono font-medium">-- -- --:--</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="text-xs font-bold text-red-600 dark:text-red-400">+45m Est.</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">In Transit</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark h-auto">
+<div class="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+<h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+<span class="material-icons text-gray-400 text-lg">fact_check</span> Scan Validation
+                        </h2>
+<span class="text-xs text-gray-500 dark:text-gray-400">3/5 Required Scans</span>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex items-start">
+<div class="flex items-center h-5">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="ml-3 text-sm">
+<label class="font-medium text-gray-900 dark:text-white">Origin Physical Scan</label>
+<p class="text-xs text-gray-500 dark:text-gray-400">Scanned by AGT-442 at MEM-GATE-4</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="flex items-center h-5">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="ml-3 text-sm">
+<label class="font-medium text-gray-900 dark:text-white">Customs Release (US)</label>
+<p class="text-xs text-gray-500 dark:text-gray-400">Automated clearance via FTZ</p>
+</div>
+</div>
+<div class="flex items-start p-2 -ml-2 rounded bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50">
+<div class="flex items-center h-5">
+<span class="material-icons text-red-500 text-lg">error</span>
+</div>
+<div class="ml-3 text-sm">
+<label class="font-medium text-red-800 dark:text-red-300">CDG Sort Inductor Scan</label>
+<p class="text-xs text-red-600 dark:text-red-400 font-bold">MISSING - Anticipated Delay</p>
+<p class="text-xs text-red-500 mt-1">Alert: Hub load is at 98% capacity.</p>
+</div>
+</div>
+<div class="flex items-start opacity-50">
+<div class="flex items-center h-5">
+<span class="material-icons text-gray-300 dark:text-gray-600 text-lg">radio_button_unchecked</span>
+</div>
+<div class="ml-3 text-sm">
+<label class="font-medium text-gray-900 dark:text-white">Delivery Van Load</label>
+<p class="text-xs text-gray-500 dark:text-gray-400">Pending arrival at DXB</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark flex flex-col">
+<div class="p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+<h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+<span class="material-icons text-gray-400 text-lg">edit_note</span> Operator Notes
+                        </h2>
+</div>
+<div class="p-4 flex-grow flex flex-col space-y-3">
+<div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded border border-yellow-100 dark:border-yellow-900/30">
+<div class="flex justify-between items-start">
+<span class="text-xs font-bold text-yellow-800 dark:text-yellow-300">System Alert</span>
+<span class="text-[10px] text-yellow-600 dark:text-yellow-400">10 OCT 14:00</span>
+</div>
+<p class="text-xs text-gray-800 dark:text-gray-300 mt-1">
+                                Weather impact reported over Atlantic corridor. Rerouting algorithm suggested southern track but pilot maintained vector.
+                            </p>
+</div>
+<div class="mt-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="comment">Add Observation</label>
+<div class="relative rounded-md shadow-sm">
+<textarea class="shadow-sm focus:ring-secondary focus:border-secondary block w-full sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-md p-2" id="comment" name="comment" placeholder="Log operational anomaly or manual override reason..." rows="4"></textarea>
+</div>
+<div class="mt-2 flex justify-end">
+<button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-primary hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition" type="button">
+                                    Save Note
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark text-center">
+<div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Package Weight</div>
+<div class="text-lg font-bold text-gray-900 dark:text-white mt-1">4.2 kg</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg shadow-sm border border-border-light dark:border-border-dark text-center">
+<div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Priority Level</div>
+<div class="text-lg font-bold text-red-600 mt-1">Critical</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

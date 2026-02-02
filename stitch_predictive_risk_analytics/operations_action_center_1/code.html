@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FedEx Operations Action Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4D148C",
+                        "fedex-purple": "#4D148C",
+                        "fedex-orange": "#FF6600",
+                        "background-light": "#F2F2F2",
+                        "surface-light": "#FFFFFF",
+                        "surface-border": "#E5E5E5",
+                        "text-primary": "#333333",
+                        "text-secondary": "#666666"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F2F2F2; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #BCBCBC; 
+        }
+        body {
+            @apply bg-background-light text-text-primary font-display h-screen flex flex-col overflow-hidden;
+        }
+    </style>
+</head>
+<body>
+<header class="flex shrink-0 items-center justify-between whitespace-nowrap border-b border-surface-border bg-fedex-purple px-6 py-3 z-20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-white">
+<div class="h-8 w-auto">
+<svg fill="none" height="32" viewBox="0 0 100 32" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.5 0H0V32H12.5V18.5H23V9.5H12.5V0Z" fill="white"></path>
+<path d="M36.5 22.5H28V32H50V22.5H41.5V18.5H50V9.5H41.5V0H28V9.5H36.5V22.5Z" fill="white"></path>
+<path d="M62 32L54 0H66L70 19L74 0H86L78 32H62Z" fill="#FF6600"></path>
+</svg>
+</div>
+<div class="h-6 w-px bg-white/20 mx-2"></div>
+<h1 class="text-white text-lg font-bold tracking-tight">Operations Action Center</h1>
+</div>
+<div class="hidden md:flex flex-col min-w-[320px]">
+<div class="flex w-full items-center rounded-lg h-9 bg-white/10 border border-white/20 focus-within:bg-white focus-within:border-white transition-all">
+<div class="text-white/70 group-focus-within:text-fedex-purple flex items-center justify-center pl-3 pr-2">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none text-sm text-white focus:text-fedex-purple focus:ring-0 placeholder:text-white/60" placeholder="Search AWB, Flight #, or Location ID"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-9 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="relative flex items-center justify-center size-9 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2.5 right-2.5 size-2 bg-fedex-orange rounded-full border border-fedex-purple"></span>
+</button>
+<div class="flex items-center gap-3 pl-2 border-l border-white/20">
+<div class="text-right hidden lg:block">
+<p class="text-xs font-semibold text-white">Sarah Jenkins</p>
+<p class="text-[10px] text-white/70">Senior Logistics Planner</p>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8 ring-2 ring-white/20" data-alt="User profile photo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFLkdPBp_tdngFIl-TY3QSPyiSgKTbOyZ37NAeZ2Ak_Dxbk4nfxStl5pXTLxmAo5yeZlggLjoDIxzzldx7UtYUh-RfrEM7_xLyBzLw_U79a7VEgsT5aOx6nThrRklgfDsfgiKzYcmBK2OB0HajFUM3mY2n_1OtIiYnoD4mqizg0DKzHvE6brwd5yAH20ijAEpDajDvP3p5P_PIKHHIoinYHIx14Lxdj83xUOGwvg_n4x-ah4M4QrgFl_mCMfH7EVl8QXSc6rpgO1fQ");'></div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-[400px] flex flex-col border-r border-surface-border bg-white shrink-0 z-10">
+<div class="p-4 border-b border-surface-border space-y-3 bg-gray-50">
+<div class="flex justify-between items-center">
+<h2 class="text-sm font-bold text-text-primary uppercase tracking-wider">Discrepancy Queue (14)</h2>
+<button class="text-fedex-purple text-xs font-semibold hover:underline">Clear Filters</button>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="flex shrink-0 items-center gap-2 rounded-full border border-surface-border bg-white px-3 py-1 hover:border-fedex-purple transition-colors">
+<span class="text-xs font-medium text-text-primary">Priority: High</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<button class="flex shrink-0 items-center gap-2 rounded-full border border-surface-border bg-white px-3 py-1 hover:border-fedex-purple transition-colors">
+<span class="text-xs font-medium text-text-primary">Region: NA</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<div class="group cursor-pointer border-l-[4px] border-fedex-purple bg-fedex-purple/[0.04] p-4 hover:bg-fedex-purple/[0.08] transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-fedex-orange text-[20px]">warning</span>
+<span class="font-mono text-sm font-bold text-fedex-purple tracking-wide">AWB 4920194</span>
+</div>
+<span class="text-[10px] font-bold text-fedex-orange bg-fedex-orange/10 px-2 py-0.5 rounded border border-fedex-orange/20 uppercase">High Priority</span>
+</div>
+<h3 class="text-text-primary text-sm font-bold mb-1">Route Deviation Detected</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Expected: JFK → MEM</span>
+<span>2h 15m ago</span>
+</div>
+</div>
+<div class="group cursor-pointer border-l-[4px] border-transparent border-b border-surface-border p-4 hover:bg-gray-50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-600 text-[20px]">qr_code_scanner</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-fedex-purple transition-colors">AWB 1029384</span>
+</div>
+<span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded border border-yellow-200 uppercase">Medium</span>
+</div>
+<h3 class="text-text-primary text-sm font-semibold mb-1">Missing STAT Scan</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: MEM Hub</span>
+<span>45m ago</span>
+</div>
+</div>
+<div class="group cursor-pointer border-l-[4px] border-transparent border-b border-surface-border p-4 hover:bg-gray-50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600 text-[20px]">schedule</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-fedex-purple transition-colors">AWB 5592011</span>
+</div>
+<span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 uppercase">Low</span>
+</div>
+<h3 class="text-text-primary text-sm font-semibold mb-1">Time Lag &gt; 4hrs</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: IND Hub</span>
+<span>6h ago</span>
+</div>
+</div>
+<div class="group cursor-pointer border-l-[4px] border-transparent border-b border-surface-border p-4 hover:bg-gray-50 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-red-600 text-[20px]">block</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-fedex-purple transition-colors">AWB 8837190</span>
+</div>
+<span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200 uppercase">Critical</span>
+</div>
+<h3 class="text-text-primary text-sm font-semibold mb-1">Customs Hold Exception</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: LHR Gateway</span>
+<span>12m ago</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light p-6 relative">
+<div class="flex flex-col gap-6 mb-6">
+<div class="flex justify-between items-start">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h2 class="text-3xl font-bold text-text-primary tracking-tight">AWB 4920194</h2>
+<span class="bg-fedex-purple text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Intl Priority</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+<span>Origin: <strong class="text-text-primary">JFK</strong> (New York)</span>
+<span class="material-symbols-outlined text-[16px] mx-1">arrow_forward</span>
+<span class="material-symbols-outlined text-[18px]">flight_land</span>
+<span>Dest: <strong class="text-text-primary">LHR</strong> (London)</span>
+</div>
+</div>
+<button class="flex items-center gap-2 bg-white hover:bg-gray-50 text-text-primary px-4 py-2 rounded-lg text-sm font-bold border border-surface-border shadow-sm transition-colors">
+<span class="material-symbols-outlined text-[18px] text-fedex-purple">description</span>
+                        View Manifest
+                    </button>
+</div>
+<div class="w-full h-32 rounded-xl overflow-hidden relative bg-white border border-surface-border shadow-sm">
+<div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeZnZDJmpXqMwUuyww1fotCElpY4EWrCM2Tba9_IeBSd2uI3QIWBrfwA-5FgMquV7LEtLuQ1cbYKtLUAxNNSG_8WP8aWZ2A6OGxwLw14yAlo5HVBG2V4vA7Kb7FkORcQooHileiMqJOTsU7a2a5yoQNPWoEghPUvExINS4RDCwcvWp8rWiNP75ajXz0IRHP8vpEY25wuHJl44yUVjPU6wPCTraEiiBSLHnk32_m4pybVQFnCfoKfrnq9qVeOv7olycczECqWagzVli');"></div>
+<div class="absolute inset-0 flex items-center px-12 z-10">
+<div class="w-full h-1 bg-gray-200 rounded-full relative">
+<div class="absolute left-0 top-0 bottom-0 w-[65%] bg-fedex-purple rounded-full"></div>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 size-4 bg-fedex-purple rounded-full border-2 border-white shadow-md"></div>
+<div class="absolute left-[65%] top-1/2 -translate-y-1/2 size-5 bg-fedex-orange rounded-full border-2 border-white shadow-lg animate-pulse"></div>
+<div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-gray-300 rounded-full border-2 border-white shadow-sm"></div>
+</div>
+<div class="absolute top-[65%] left-[65%] -translate-x-1/2 mt-2 bg-text-primary text-white text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap shadow-xl">
+                            CURRENT STATUS: MEM HUB (DELAYED)
+                        </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+<div class="xl:col-span-2 flex flex-col gap-6">
+<div class="bg-red-50 border border-red-200 rounded-xl p-5 flex gap-4 items-start shadow-sm">
+<div class="bg-red-100 p-2 rounded-lg text-red-600 shrink-0">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h3 class="text-red-700 font-bold text-xs mb-1 uppercase tracking-wider">Failure Analysis</h3>
+<p class="text-text-primary text-sm leading-relaxed">
+                                Automated scan logic detected package 4920194 on belt line B4 (Domestic Sort) instead of Int'l Outbound. Potential routing label error or mis-sort. Package is currently idle.
+                            </p>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-surface-border shadow-sm overflow-hidden">
+<div class="p-4 border-b border-surface-border bg-gray-50">
+<h3 class="font-bold text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-fedex-purple">build_circle</span>
+                                Resolution Workspace
+                            </h3>
+</div>
+<div class="p-6 space-y-6">
+<div>
+<label class="block text-xs font-bold text-text-secondary uppercase mb-3">Select Corrective Action</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-white peer-checked:border-fedex-purple peer-checked:bg-fedex-purple/[0.03] hover:border-fedex-purple/50 transition-all h-full ring-inset">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-fedex-purple">alt_route</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-fedex-purple peer-checked:bg-fedex-purple flex items-center justify-center after:content-[''] after:block after:size-1.5 after:bg-white after:rounded-full"></div>
+</div>
+<p class="text-sm font-bold text-text-primary">Re-route Courier</p>
+<p class="text-xs text-text-secondary mt-1">Assign new flight path</p>
+</div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-white peer-checked:border-fedex-purple peer-checked:bg-fedex-purple/[0.03] hover:border-fedex-purple/50 transition-all h-full ring-inset">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-fedex-purple">edit_document</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-fedex-purple peer-checked:bg-fedex-purple flex items-center justify-center after:content-[''] after:block after:size-1.5 after:bg-white after:rounded-full"></div>
+</div>
+<p class="text-sm font-bold text-text-primary">Manual Override</p>
+<p class="text-xs text-text-secondary mt-1">Force update status</p>
+</div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-white peer-checked:border-fedex-orange peer-checked:bg-fedex-orange/[0.03] hover:border-fedex-orange/50 transition-all h-full ring-inset">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-fedex-orange">campaign</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-fedex-orange peer-checked:bg-fedex-orange flex items-center justify-center after:content-[''] after:block after:size-1.5 after:bg-white after:rounded-full"></div>
+</div>
+<p class="text-sm font-bold text-text-primary">Escalate to Hub</p>
+<p class="text-xs text-text-secondary mt-1">Notify floor manager</p>
+</div>
+</label>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-xs font-bold text-text-secondary uppercase">Reason Code</label>
+<div class="relative">
+<select class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
+<option>SORT_ERR_01 (Sortation Error)</option>
+<option>LBL_DMG_04 (Label Damaged)</option>
+<option>FLT_CNCL_02 (Flight Cancellation)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-text-secondary uppercase">New Destination Hub</label>
+<div class="relative">
+<select class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
+<option>MEM (Memphis SuperHub)</option>
+<option>IND (Indianapolis)</option>
+<option>CDG (Paris Charles de Gaulle)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-text-secondary uppercase">Operational Notes</label>
+<textarea class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple p-3 min-h-[100px] shadow-sm" placeholder="Add context for the audit log..."></textarea>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<input class="rounded border-surface-border text-fedex-purple focus:ring-0" id="notify" type="checkbox"/>
+<label class="text-sm font-medium text-text-secondary select-none" for="notify">Notify Origin Station</label>
+</div>
+<button class="bg-fedex-purple hover:bg-fedex-purple/90 text-white font-bold text-sm px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg flex items-center gap-2 transition-all transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Submit Resolution
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<div class="bg-white rounded-xl border border-surface-border p-5 shadow-sm">
+<h4 class="text-xs font-bold text-text-secondary uppercase mb-4 border-b border-surface-border pb-2">Package Specifications</h4>
+<div class="space-y-3">
+<div class="flex justify-between py-1.5">
+<span class="text-sm text-text-secondary font-medium">Weight</span>
+<span class="text-sm text-text-primary font-bold">12.4 kg</span>
+</div>
+<div class="flex justify-between py-1.5">
+<span class="text-sm text-text-secondary font-medium">Dimensions</span>
+<span class="text-sm text-text-primary font-bold">40x30x25 cm</span>
+</div>
+<div class="flex justify-between py-1.5">
+<span class="text-sm text-text-secondary font-medium">Service</span>
+<span class="text-sm text-text-primary font-bold">FedEx Intl Priority</span>
+</div>
+<div class="flex justify-between py-1.5">
+<span class="text-sm text-text-secondary font-medium">Content Type</span>
+<span class="text-sm text-text-primary font-bold">Medical Supplies</span>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-surface-border flex-1 flex flex-col min-h-[300px] shadow-sm overflow-hidden">
+<div class="p-4 border-b border-surface-border bg-gray-50">
+<h4 class="text-xs font-bold text-text-secondary uppercase">Resolution History</h4>
+</div>
+<div class="p-4 overflow-y-auto flex-1 max-h-[400px]">
+<div class="relative pl-6 border-l-2 border-surface-border space-y-6">
+<div class="relative">
+<div class="absolute -left-[33px] top-1 size-3.5 bg-gray-200 rounded-full border-2 border-white"></div>
+<div class="flex flex-col">
+<p class="text-sm text-text-primary font-bold">System Alert Triggered</p>
+<p class="text-xs text-text-secondary mt-0.5">Route deviation detected at node MEM-04.</p>
+<p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Today, 08:42 AM • Automated</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[33px] top-1 size-3.5 bg-fedex-purple rounded-full border-2 border-white shadow-sm"></div>
+<div class="flex flex-col">
+<p class="text-sm text-text-primary font-bold">Opened by Sarah Jenkins</p>
+<p class="text-xs text-text-secondary mt-0.5">Status changed to "Investigating".</p>
+<p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Today, 09:15 AM</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[33px] top-1 size-3.5 bg-gray-200 rounded-full border-2 border-white"></div>
+<div class="flex flex-col">
+<p class="text-sm text-text-primary font-bold">Scan Event</p>
+<p class="text-xs text-text-secondary mt-0.5">Arrived at Sort Facility.</p>
+<p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Today, 06:30 AM • Scanner ID 4492</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-surface-border bg-gray-50">
+<div class="flex gap-2">
+<input class="w-full bg-white border border-surface-border rounded px-3 py-2 text-xs text-text-primary font-medium placeholder:text-text-secondary/60 focus:ring-1 focus:ring-fedex-purple focus:border-fedex-purple shadow-sm" placeholder="Add a quick observation..."/>
+<button class="bg-fedex-purple text-white p-2 rounded shadow hover:bg-fedex-purple/90 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

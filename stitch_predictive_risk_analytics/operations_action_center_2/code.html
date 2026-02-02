@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FedEx Operations Action Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f13ec",
+                        "fedex-purple": "#4D148C",
+                        "fedex-orange": "#FF6600",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#141118", // Deep charcoal/black
+                        "surface-dark": "#1e1e24", // Slightly lighter for cards
+                        "surface-border": "#302839", // Borders
+                        "text-secondary": "#ab9db9"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141118; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #302839; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4055; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation -->
+<header class="flex shrink-0 items-center justify-between whitespace-nowrap border-b border-solid border-surface-border bg-[#191022] px-6 py-3 z-20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-white">
+<div class="h-8 w-auto text-white">
+<!-- Simplified Logo Placeholder mimicking brand shape -->
+<svg fill="none" height="32" viewbox="0 0 100 32" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.5 0H0V32H12.5V18.5H23V9.5H12.5V0Z" fill="currentColor"></path>
+<path d="M36.5 22.5H28V32H50V22.5H41.5V18.5H50V9.5H41.5V0H28V9.5H36.5V22.5Z" fill="currentColor"></path>
+<path d="M62 32L54 0H66L70 19L74 0H86L78 32H62Z" fill="#FF6600"></path>
+</svg>
+</div>
+<div class="h-6 w-px bg-surface-border mx-2"></div>
+<h1 class="text-white text-lg font-bold tracking-tight">Operations Action Center</h1>
+</div>
+<!-- Global Search -->
+<div class="hidden md:flex flex-col min-w-[320px]">
+<div class="flex w-full items-center rounded-lg h-9 bg-surface-border/50 border border-surface-border focus-within:border-primary transition-colors">
+<div class="text-text-secondary flex items-center justify-center pl-3 pr-2">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none text-sm text-white focus:ring-0 placeholder:text-text-secondary" placeholder="Search AWB, Flight #, or Location ID"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-9 rounded-full hover:bg-surface-border text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="relative flex items-center justify-center size-9 rounded-full hover:bg-surface-border text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-fedex-orange rounded-full border border-[#191022]"></span>
+</button>
+<div class="flex items-center gap-3 pl-2 border-l border-surface-border">
+<div class="text-right hidden lg:block">
+<p class="text-xs font-medium text-white">Sarah Jenkins</p>
+<p class="text-[10px] text-text-secondary">Senior Logistics Planner</p>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8 ring-2 ring-surface-border" data-alt="User profile photo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFLkdPBp_tdngFIl-TY3QSPyiSgKTbOyZ37NAeZ2Ak_Dxbk4nfxStl5pXTLxmAo5yeZlggLjoDIxzzldx7UtYUh-RfrEM7_xLyBzLw_U79a7VEgsT5aOx6nThrRklgfDsfgiKzYcmBK2OB0HajFUM3mY2n_1OtIiYnoD4mqizg0DKzHvE6brwd5yAH20ijAEpDajDvP3p5P_PIKHHIoinYHIx14Lxdj83xUOGwvg_n4x-ah4M4QrgFl_mCMfH7EVl8QXSc6rpgO1fQ");'></div>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Sidebar: The Queue -->
+<aside class="w-[400px] flex flex-col border-r border-surface-border bg-[#191022] shrink-0 z-10">
+<!-- Filter Bar -->
+<div class="p-4 border-b border-surface-border space-y-3">
+<div class="flex justify-between items-center">
+<h2 class="text-sm font-semibold text-text-secondary uppercase tracking-wider">Discrepancy Queue (14)</h2>
+<button class="text-primary text-xs font-medium hover:underline">Clear Filters</button>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="flex shrink-0 items-center gap-2 rounded-full border border-surface-border bg-surface-dark px-3 py-1 hover:bg-[#302839] transition-colors">
+<span class="text-xs font-medium text-white">Priority: High</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<button class="flex shrink-0 items-center gap-2 rounded-full border border-surface-border bg-surface-dark px-3 py-1 hover:bg-[#302839] transition-colors">
+<span class="text-xs font-medium text-white">Region: NA</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</div>
+<!-- List Items -->
+<div class="flex-1 overflow-y-auto">
+<!-- Active Item -->
+<div class="group cursor-pointer border-l-[3px] border-primary bg-[#302839]/40 p-4 hover:bg-[#302839]/60 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-fedex-orange text-[20px]">warning</span>
+<span class="font-mono text-sm font-bold text-white tracking-wide">AWB 4920194</span>
+</div>
+<span class="text-xs font-medium text-fedex-orange bg-fedex-orange/10 px-2 py-0.5 rounded">High Priority</span>
+</div>
+<h3 class="text-white text-sm font-medium mb-1">Route Deviation Detected</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Expected: JFK → MEM</span>
+<span>2h 15m ago</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group cursor-pointer border-l-[3px] border-transparent border-b border-surface-border/50 p-4 hover:bg-[#302839]/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500 text-[20px]">qr_code_scanner</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-white transition-colors">AWB 1029384</span>
+</div>
+<span class="text-xs font-medium text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">Medium</span>
+</div>
+<h3 class="text-text-secondary group-hover:text-white text-sm font-medium mb-1 transition-colors">Missing STAT Scan</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: MEM Hub</span>
+<span>45m ago</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group cursor-pointer border-l-[3px] border-transparent border-b border-surface-border/50 p-4 hover:bg-[#302839]/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-400 text-[20px]">schedule</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-white transition-colors">AWB 5592011</span>
+</div>
+<span class="text-xs font-medium text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded">Low</span>
+</div>
+<h3 class="text-text-secondary group-hover:text-white text-sm font-medium mb-1 transition-colors">Time Lag &gt; 4hrs</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: IND Hub</span>
+<span>6h ago</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group cursor-pointer border-l-[3px] border-transparent border-b border-surface-border/50 p-4 hover:bg-[#302839]/40 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500 text-[20px]">block</span>
+<span class="font-mono text-sm font-bold text-text-secondary group-hover:text-white transition-colors">AWB 8837190</span>
+</div>
+<span class="text-xs font-medium text-red-500 bg-red-500/10 px-2 py-0.5 rounded">Critical</span>
+</div>
+<h3 class="text-text-secondary group-hover:text-white text-sm font-medium mb-1 transition-colors">Customs Hold Exception</h3>
+<div class="flex justify-between items-center text-xs text-text-secondary">
+<span>Loc: LHR Gateway</span>
+<span>12m ago</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Detail Panel: The Workspace -->
+<main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-dark p-6 relative">
+<!-- Header Section -->
+<div class="flex flex-col gap-6 mb-6">
+<div class="flex justify-between items-start">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h2 class="text-3xl font-bold text-white tracking-tight">AWB 4920194</h2>
+<span class="bg-fedex-purple/20 text-fedex-purple text-xs font-bold px-2 py-1 rounded border border-fedex-purple/30 uppercase">Intl Priority</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary text-sm">
+<span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+<span>Origin: <strong>JFK</strong> (New York)</span>
+<span class="material-symbols-outlined text-[16px] mx-1">arrow_forward</span>
+<span class="material-symbols-outlined text-[18px]">flight_land</span>
+<span>Dest: <strong>LHR</strong> (London)</span>
+</div>
+</div>
+<button class="flex items-center gap-2 bg-surface-dark hover:bg-[#302839] text-white px-4 py-2 rounded-lg text-sm font-medium border border-surface-border transition-colors">
+<span class="material-symbols-outlined text-[18px]">description</span>
+                        View Manifest
+                    </button>
+</div>
+<!-- Route Visualizer -->
+<div class="w-full h-32 rounded-xl overflow-hidden relative bg-surface-dark border border-surface-border">
+<!-- Map Background -->
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity" data-location="World Map" style="background-image: url('https://placeholder.pics/svg/300');"></div>
+<!-- Route Overlay (simulated) -->
+<div class="absolute inset-0 flex items-center px-12 z-10">
+<div class="w-full h-1 bg-surface-border rounded-full relative">
+<div class="absolute left-0 top-0 bottom-0 w-[65%] bg-primary rounded-full"></div>
+<!-- Points -->
+<div class="absolute left-0 top-1/2 -translate-y-1/2 size-4 bg-primary rounded-full border-2 border-white shadow-lg tooltip-trigger"></div>
+<div class="absolute left-[65%] top-1/2 -translate-y-1/2 size-4 bg-fedex-orange rounded-full border-2 border-white shadow-lg animate-pulse"></div>
+<div class="absolute right-0 top-1/2 -translate-y-1/2 size-3 bg-surface-border rounded-full"></div>
+</div>
+<div class="absolute top-[60%] left-[65%] -translate-x-1/2 mt-2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap backdrop-blur-sm border border-white/10">
+                            Current Location: MEM Hub (Delayed)
+                         </div>
+</div>
+</div>
+</div>
+<!-- Two Column Layout for Action & Info -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+<!-- Center Column: Analysis & Action -->
+<div class="xl:col-span-2 flex flex-col gap-6">
+<!-- Failure Analysis Widget -->
+<div class="bg-red-500/5 border border-red-500/20 rounded-xl p-5 flex gap-4 items-start">
+<div class="bg-red-500/10 p-2 rounded-lg text-red-500 shrink-0">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h3 class="text-red-400 font-semibold text-sm mb-1 uppercase tracking-wide">Failure Analysis</h3>
+<p class="text-white text-sm leading-relaxed">
+                                Automated scan logic detected package 4920194 on belt line B4 (Domestic Sort) instead of Int'l Outbound. Potential routing label error or mis-sort. Package is currently idle.
+                            </p>
+</div>
+</div>
+<!-- Corrective Action Form -->
+<div class="bg-surface-dark rounded-xl border border-surface-border overflow-hidden">
+<div class="p-4 border-b border-surface-border bg-[#251e2b]">
+<h3 class="font-semibold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">build_circle</span>
+                                Resolution Workspace
+                            </h3>
+</div>
+<div class="p-6 space-y-6">
+<!-- Action Type Selection -->
+<div>
+<label class="block text-xs font-medium text-text-secondary uppercase mb-3">Select Corrective Action</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-[#141118] peer-checked:border-primary peer-checked:bg-primary/10 hover:border-primary/50 transition-all h-full">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-primary">alt_route</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-primary peer-checked:bg-primary"></div>
+</div>
+<p class="text-sm font-medium text-white">Re-route Courier</p>
+<p class="text-xs text-text-secondary mt-1">Assign new flight path</p>
+</div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-[#141118] peer-checked:border-primary peer-checked:bg-primary/10 hover:border-primary/50 transition-all h-full">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-primary">edit_document</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-primary peer-checked:bg-primary"></div>
+</div>
+<p class="text-sm font-medium text-white">Manual Override</p>
+<p class="text-xs text-text-secondary mt-1">Force update status</p>
+</div>
+</label>
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="action_type" type="radio"/>
+<div class="p-4 rounded-lg border border-surface-border bg-[#141118] peer-checked:border-fedex-orange peer-checked:bg-fedex-orange/10 hover:border-fedex-orange/50 transition-all h-full">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-text-secondary peer-checked:text-fedex-orange">campaign</span>
+<div class="size-4 rounded-full border border-surface-border peer-checked:border-fedex-orange peer-checked:bg-fedex-orange"></div>
+</div>
+<p class="text-sm font-medium text-white">Escalate to Hub</p>
+<p class="text-xs text-text-secondary mt-1">Notify floor manager</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Dynamic Form Fields -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-sm text-text-secondary">Reason Code</label>
+<div class="relative">
+<select class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
+<option>SORT_ERR_01 (Sortation Error)</option>
+<option>LBL_DMG_04 (Label Damaged)</option>
+<option>FLT_CNCL_02 (Flight Cancellation)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="text-sm text-text-secondary">New Destination Hub</label>
+<div class="relative">
+<select class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
+<option>MEM (Memphis SuperHub)</option>
+<option>IND (Indianapolis)</option>
+<option>CDG (Paris Charles de Gaulle)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Comments Area -->
+<div class="space-y-1">
+<label class="text-sm text-text-secondary">Operational Notes</label>
+<textarea class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary p-3 min-h-[100px]" placeholder="Add context for the audit log..."></textarea>
+</div>
+<!-- Action Footer -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<input class="rounded border-surface-border bg-[#141118] text-primary focus:ring-0" id="notify" type="checkbox"/>
+<label class="text-sm text-text-secondary select-none" for="notify">Notify Origin Station</label>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-medium text-sm px-6 py-2.5 rounded-lg shadow-lg shadow-primary/20 flex items-center gap-2 transition-all transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Submit Resolution
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Context & History -->
+<div class="flex flex-col gap-6">
+<!-- Package Specs -->
+<div class="bg-surface-dark rounded-xl border border-surface-border p-5">
+<h4 class="text-xs font-semibold text-text-secondary uppercase mb-4">Package Specifications</h4>
+<div class="space-y-3">
+<div class="flex justify-between py-2 border-b border-surface-border/50">
+<span class="text-sm text-text-secondary">Weight</span>
+<span class="text-sm text-white font-medium">12.4 kg</span>
+</div>
+<div class="flex justify-between py-2 border-b border-surface-border/50">
+<span class="text-sm text-text-secondary">Dimensions</span>
+<span class="text-sm text-white font-medium">40x30x25 cm</span>
+</div>
+<div class="flex justify-between py-2 border-b border-surface-border/50">
+<span class="text-sm text-text-secondary">Service</span>
+<span class="text-sm text-white font-medium">FedEx Intl Priority</span>
+</div>
+<div class="flex justify-between py-2">
+<span class="text-sm text-text-secondary">Content Type</span>
+<span class="text-sm text-white font-medium">Medical Supplies</span>
+</div>
+</div>
+</div>
+<!-- History Log -->
+<div class="bg-surface-dark rounded-xl border border-surface-border flex-1 flex flex-col min-h-[300px]">
+<div class="p-4 border-b border-surface-border">
+<h4 class="text-xs font-semibold text-text-secondary uppercase">Resolution History</h4>
+</div>
+<div class="p-4 overflow-y-auto flex-1 max-h-[400px]">
+<div class="relative pl-4 border-l border-surface-border space-y-6">
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[21px] top-1 size-3 bg-surface-border rounded-full border-2 border-surface-dark"></div>
+<div class="flex flex-col">
+<p class="text-sm text-white font-medium">System Alert Triggered</p>
+<p class="text-xs text-text-secondary">Route deviation detected at node MEM-04.</p>
+<p class="text-[10px] text-text-secondary mt-1 opacity-70">Today, 08:42 AM • Automated</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[21px] top-1 size-3 bg-primary rounded-full border-2 border-surface-dark"></div>
+<div class="flex flex-col">
+<p class="text-sm text-white font-medium">Opened by Sarah Jenkins</p>
+<p class="text-xs text-text-secondary">Status changed to "Investigating".</p>
+<p class="text-[10px] text-text-secondary mt-1 opacity-70">Today, 09:15 AM</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[21px] top-1 size-3 bg-surface-border rounded-full border-2 border-surface-dark"></div>
+<div class="flex flex-col">
+<p class="text-sm text-white font-medium">Scan Event</p>
+<p class="text-xs text-text-secondary">Arrived at Sort Facility.</p>
+<p class="text-[10px] text-text-secondary mt-1 opacity-70">Today, 06:30 AM • Scanner ID 4492</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Add Note -->
+<div class="p-3 border-t border-surface-border bg-[#141118] rounded-b-xl">
+<div class="flex gap-2">
+<input class="w-full bg-surface-dark border-none rounded text-xs text-white placeholder:text-text-secondary/50 focus:ring-1 focus:ring-primary" placeholder="Quick note..."/>
+<button class="text-primary hover:text-white p-1 rounded hover:bg-surface-border transition-colors">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedEx OpsPulse | Shipment Control Tower</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet JS (Stable Map Engine) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Icon Font (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- FedEx Brand Identity --- */
+        :root {
+            --fx-purple: #4D148C;
+            --fx-orange: #FF6600;
+            --fx-platinum: #E6E6E6;
+            --fx-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F2F4F8;
+            color: #333;
+        }
+
+        /* --- Utility Classes --- */
+        .text-fx-purple { color: var(--fx-purple); }
+        .bg-fx-purple { background-color: var(--fx-purple); }
+        .text-fx-orange { color: var(--fx-orange); }
+        .bg-fx-orange { background-color: var(--fx-orange); }
+
+        .btn-primary {
+            background-color: var(--fx-orange);
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #e55b00;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Card Components --- */
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-top: 4px solid transparent;
+        }
+        .card-active { border-top-color: var(--fx-purple); }
+        .card-alert { border-top-color: var(--fx-orange); }
+
+        /* --- Map Styling --- */
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            z-index: 1;
+        }
+        #map { width: 100%; height: 100%; background: #f0f0f0; }
+
+        /* --- Leaflet Custom Markers --- */
+        .custom-div-icon { background: transparent; border: none; }
+        .marker-pin {
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+        .pin-completed { background: #10B981; width: 14px; height: 14px; border: 2px solid white; }
+        .pin-alert { background: #EF4444; width: 22px; height: 22px; border: 3px solid white; animation: pulse-red 2s infinite; }
+        .pin-future { background: #9CA3AF; width: 12px; height: 12px; border: 2px solid white; }
+
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* --- Timeline Styling --- */
+        .timeline-line {
+            position: absolute; left: 23px; top: 20px; bottom: 20px; width: 3px;
+            background-color: #E5E7EB; z-index: 0;
+        }
+
+        /* --- Loading Overlay --- */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+        #loadingOverlay.hidden-overlay { opacity: 0; pointer-events: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="w-16 h-16 border-4 border-fx-purple border-t-fx-orange rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium animate-pulse">Initializing Control Tower...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-fx-purple text-white shadow-md z-50 sticky top-0">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <div class="font-black text-2xl tracking-tighter select-none">
+                    <span class="text-white">Fed</span><span class="text-fx-orange">Ex</span>
+                    <span class="text-xs font-normal text-gray-300 ml-1 tracking-normal opacity-80">OpsPulse</span>
+                </div>
+                <div class="hidden md:flex h-6 w-px bg-purple-700"></div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+		    <a href="file:///C:/Users/9787080/Downloads/WEB/T1.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Shipment Control Tower</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T2.html#" class="text-purple-300 hover:text-white transition-colors">Global Command</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T3.html#" class="text-purple-300 hover:text-white transition-colors">Shipment Watch</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T4.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Hub Pulse</a>
+                </nav>
+            </div>
+
+            
+            <div class="flex items-center bg-purple-900 rounded-sm p-0.5 border border-purple-700 shadow-inner">
+                <input type="text" id="awbInput" placeholder="AWB Number" 
+                       class="bg-transparent border-none text-white placeholder-purple-400 focus:outline-none w-56 text-sm font-mono px-3 py-1.5"
+                       value="794827104829">
+                <button id="searchBtn" class="bg-fx-orange hover:bg-orange-600 text-white px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors h-full">
+                    TRACK
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="flex-grow container mx-auto px-4 py-6 space-y-6">
+
+        <!-- Intro -->
+        <div class="flex justify-between items-end border-b border-gray-200 pb-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Proactive Monitoring</h1>
+                <p class="text-sm text-gray-500">Live telemetry and predictive analytics for active consignments.</p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs font-bold text-gray-400 uppercase">System Time (UTC)</p>
+                <p class="text-lg font-mono font-bold text-fx-purple" id="systemClock">--:--:--</p>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div id="dashboardContent" class="space-y-6">
+
+            <!-- KPI Row -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                
+                <!-- KPI 1: Status -->
+                <div class="md:col-span-4 card card-active p-5 flex flex-col relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3 opacity-10">
+                        <i class="ph ph-trend-up text-6xl text-fx-purple"></i>
+                    </div>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Predictive Status</p>
+                    <h2 id="statusText" class="text-3xl font-black text-gray-800 mt-1">CALCULATING...</h2>
+                    
+                    <div class="mt-4 space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-gray-600">On-Time Probability</span>
+                                <span id="probText" class="text-fx-purple">--%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                                <div id="probBar" class="bg-fx-purple h-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 bg-red-50 border border-red-100 rounded text-xs text-red-800 font-medium hidden" id="delayAlertBox">
+                            <i class="ph ph-warning-diamond text-lg"></i>
+                            <span>Projected +4h delay vs. commitment time.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Hub Context -->
+                <div class="md:col-span-4 card card-alert p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Location Context</p>
+                        <span id="currentHubBadge" class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold rounded">...</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-2 bg-gray-50 rounded border border-gray-100">
+                            <i class="ph ph-thermometer text-fx-orange text-xl mb-1"></i>
+                            <div class="text-xs text-gray-500">Weather</div>
+                            <div class="font-bold text-gray-800" id="weatherText">--</div>
+                        </div>
+                        <div class="text-center p-2 bg-gray-50 rounded border border-gray-100">
+                            <i class="ph ph-conveyor-belt text-fx-purple text-xl mb-1"></i>
+                            <div class="text-xs text-gray-500">Hub Load</div>
+                            <div class="font-bold text-red-600" id="hubLoadText">--%</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3 italic text-center">
+                        <i class="ph ph-info mr-1"></i>Live load factor from Cosmos.
+                    </p>
+                </div>
+
+                <!-- KPI 3: AI Action -->
+                <div class="md:col-span-4 card p-5 flex flex-col justify-center items-center bg-gradient-to-br from-white to-purple-50 border border-purple-100 text-center">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 text-fx-purple text-2xl">
+                        <i class="ph ph-sparkle-fill"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-sm">AI Resolution Center</h3>
+                    <p class="text-xs text-gray-500 mb-4 px-4">Generate recovery options using Gemini 2.5.</p>
+                    <button id="btnAnalyze" class="w-full btn-primary py-2 px-4 rounded text-sm font-bold shadow-lg flex items-center justify-center gap-2">
+                        <span>RUN ANALYSIS</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visuals Row: Map & Timeline -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Leaflet Map -->
+                <div class="lg:col-span-2 card p-0 flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                        <h3 class="font-bold text-gray-700 text-sm uppercase">Live Route Telemetry</h3>
+                        <div class="flex gap-2 text-xs font-medium">
+                            <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-green-500 mr-1"></span>Completed</span>
+                            <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-1 animate-pulse"></span>Alert</span>
+                        </div>
+                    </div>
+                    <div class="map-wrapper bg-gray-100">
+                        <div id="map"></div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="lg:col-span-1 card p-0 flex flex-col h-[500px]">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-bold text-gray-700 text-sm uppercase">Route Execution</h3>
+                    </div>
+                    <div class="flex-grow overflow-y-auto p-4 relative" id="timelineContainer">
+                        <div class="timeline-line"></div>
+                        <div id="timelineList" class="space-y-6 relative z-10">
+                            <!-- JS Injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Scan Details Table -->
+                <div class="card p-5">
+                    <h3 class="font-bold text-gray-700 text-sm uppercase mb-4 flex items-center">
+                        <i class="ph ph-list-checks text-lg mr-2 text-fx-orange"></i>
+                        SOP Scan Audit
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-xs text-left">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-400 uppercase">
+                                    <th class="py-2 pl-2">Code</th>
+                                    <th class="py-2">Description</th>
+                                    <th class="py-2">Location</th>
+                                    <th class="py-2 text-right pr-2">Delta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scanTableBody" class="font-mono text-gray-600">
+                                <tr><td colspan="4" class="py-4 text-center">Select a stop to view scans.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- AI Output Section -->
+                <div class="card p-5 border border-purple-100 bg-purple-50">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-fx-purple text-sm uppercase flex items-center">
+                            <i class="ph ph-brain text-lg mr-2"></i>
+                            Gemini Analysis
+                        </h3>
+                        <span id="aiStatusBadge" class="hidden px-2 py-0.5 bg-white border border-purple-200 text-purple-700 text-xs font-bold rounded shadow-sm">AI ACTIVE</span>
+                    </div>
+                    <div id="aiContentArea" class="text-sm text-gray-600 min-h-[150px]">
+                        <p class="italic opacity-60 mt-4">Waiting for analysis trigger...</p>
+                    </div>
+                    
+                    <!-- Email Draft -->
+                    <div id="emailDraft" class="hidden mt-4 pt-4 border-t border-purple-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-xs text-gray-700 uppercase">Suggested Communication</h4>
+                            <button onclick="copyEmail()" class="text-xs text-fx-orange hover:underline font-bold">Copy to Clipboard</button>
+                        </div>
+                        <div class="bg-white p-3 rounded border border-gray-200 text-xs font-mono text-gray-700 whitespace-pre-wrap" id="emailText"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Application Logic -->
+    <script>
+        // --- CONSTANTS ---
+        const apiKey = ""; // System provided
+        
+        const SCAN_CODES = {
+            PU: { label: 'Picked Up', icon: 'package' },
+            OC: { label: 'Shipment Info Sent', icon: 'file-text' },
+            AR: { label: 'Arrived at Facility', icon: 'house-line' },
+            SORT: { label: 'Sortation Complete', icon: 'arrows-split' },
+            DP: { label: 'Departed Facility', icon: 'truck' },
+            DL: { label: 'Delivered', icon: 'check-circle' },
+            DY: { label: 'Delay / Exception', icon: 'warning-circle' }
+        };
+
+        const awbDatabase = {
+            '794827104829': {
+                status: 'delayed',
+                probOnTime: 35,
+                currentHub: 'IND',
+                weather: 'Heavy Snow',
+                hubCongestion: 94,
+                route: [
+                    {
+                        id: 'MEM', name: 'Memphis (MEM)', type: 'Origin', status: 'completed',
+                        coords: [35.149, -90.048],
+                        scans: [
+                            { code: 'OC', time: '08:30', delta: '0', status: 'ok' },
+                            { code: 'PU', time: '10:15', delta: '+15m', status: 'ok' },
+                            { code: 'AR', time: '14:00', delta: '-10m', status: 'ok' },
+                            { code: 'DP', time: '22:00', delta: '0', status: 'ok' }
+                        ]
+                    },
+                    {
+                        id: 'IND', name: 'Indianapolis (IND)', type: 'Current', status: 'alert',
+                        coords: [39.768, -86.158],
+                        scans: [
+                            { code: 'AR', time: '04:30', delta: '+2h', status: 'warning', note: 'Late Flight Arrival' },
+                            { code: 'SORT', time: null, delta: null, status: 'missing', note: 'CRITICAL: Missed Outbound Sort Window' }
+                        ]
+                    },
+                    {
+                        id: 'EWR', name: 'Newark (EWR)', type: 'Future', status: 'pending',
+                        coords: [40.689, -74.172],
+                        scans: []
+                    },
+                    {
+                        id: 'CDG', name: 'Paris (CDG)', type: 'Destination', status: 'pending',
+                        coords: [49.009, 2.547],
+                        scans: []
+                    }
+                ]
+            },
+            '123456789012': { // Happy path for testing
+                status: 'ok',
+                probOnTime: 98,
+                currentHub: 'EWR',
+                weather: 'Clear',
+                hubCongestion: 45,
+                route: [
+                    { id: 'MEM', name: 'Memphis (MEM)', type: 'Origin', status: 'completed', coords: [35.149, -90.048], scans: [{code:'PU', status:'ok'}, {code:'DP', status:'ok'}] },
+                    { id: 'IND', name: 'Indianapolis (IND)', type: 'Transit', status: 'completed', coords: [39.768, -86.158], scans: [{code:'AR', status:'ok'}, {code:'SORT', status:'ok'}, {code:'DP', status:'ok'}] },
+                    { id: 'EWR', name: 'Newark (EWR)', type: 'Current', status: 'active', coords: [40.689, -74.172], scans: [{code:'AR', status:'ok'}] },
+                    { id: 'LHR', name: 'London (LHR)', type: 'Destination', status: 'pending', coords: [51.470, -0.454], scans: [] }
+                ]
+            }
+        };
+
+        // --- STATE & DOM ---
+        let map, polyline, markers = [];
+        
+        const dom = {
+            input: document.getElementById('awbInput'),
+            btn: document.getElementById('searchBtn'),
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            statusText: document.getElementById('statusText'),
+            probText: document.getElementById('probText'),
+            probBar: document.getElementById('probBar'),
+            delayBox: document.getElementById('delayAlertBox'),
+            hubBadge: document.getElementById('currentHubBadge'),
+            weather: document.getElementById('weatherText'),
+            hubLoad: document.getElementById('hubLoadText'),
+            timeline: document.getElementById('timelineList'),
+            scanTable: document.getElementById('scanTableBody'),
+            aiBtn: document.getElementById('btnAnalyze'),
+            aiContent: document.getElementById('aiContentArea'),
+            aiBadge: document.getElementById('aiStatusBadge'),
+            emailSection: document.getElementById('emailDraft'),
+            emailText: document.getElementById('emailText')
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(() => {
+                document.getElementById('systemClock').innerText = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            }, 1000);
+
+            initMap();
+            dom.btn.addEventListener('click', runSearch);
+            dom.input.addEventListener('keypress', (e) => { if(e.key === 'Enter') runSearch() });
+            dom.aiBtn.addEventListener('click', runAIAnalysis);
+
+            // Initial load
+            runSearch();
+        });
+
+        // --- LEAFLET MAP SETUP ---
+        function initMap() {
+            try {
+                map = L.map('map', { zoomControl: false, attributionControl: false }).setView([40, -40], 3);
+                L.control.zoom({ position: 'topright' }).addTo(map);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 20
+                }).addTo(map);
+            } catch(e) {
+                console.error("Leaflet Init Error:", e);
+                document.getElementById('map').innerHTML = '<div class="flex items-center justify-center h-full text-red-500 font-bold">Map Loading Error</div>';
+            }
+        }
+
+        // --- MAIN LOGIC ---
+        function runSearch() {
+            const awb = dom.input.value.trim();
+            dom.loadingOverlay.classList.remove('hidden-overlay');
+
+            setTimeout(() => {
+                const data = awbDatabase[awb] || awbDatabase['794827104829']; // Default to problem scenario
+                renderDashboard(data);
+                
+                // Hide overlay
+                dom.loadingOverlay.classList.add('hidden-overlay');
+                
+                if (map) {
+                    map.invalidateSize();
+                    updateMap(data.route);
+                }
+            }, 800);
+        }
+
+        function renderDashboard(data) {
+            // KPI Logic
+            if (data.status === 'delayed') {
+                dom.statusText.innerText = "EXCEPTION";
+                dom.statusText.className = "text-3xl font-black text-red-600 mt-1";
+                dom.probBar.className = "bg-red-600 h-full";
+                dom.probText.className = "text-red-600";
+                dom.delayBox.classList.remove('hidden');
+            } else {
+                dom.statusText.innerText = "ON SCHEDULE";
+                dom.statusText.className = "text-3xl font-black text-green-600 mt-1";
+                dom.probBar.className = "bg-green-600 h-full";
+                dom.probText.className = "text-green-600";
+                dom.delayBox.classList.add('hidden');
+            }
+
+            dom.probText.innerText = data.probOnTime + "%";
+            dom.probBar.style.width = data.probOnTime + "%";
+            dom.hubBadge.innerText = data.currentHub;
+            dom.weather.innerText = data.weather;
+            dom.hubLoad.innerText = data.hubCongestion + "%";
+
+            // Colors for hub load
+            dom.hubLoad.className = data.hubCongestion > 80 ? "font-bold text-red-600" : "font-bold text-green-600";
+
+            // Render Timeline
+            renderTimeline(data.route);
+            
+            // Reset AI
+            dom.aiContent.innerHTML = '<p class="italic opacity-60 mt-4">Waiting for analysis...</p>';
+            dom.emailSection.classList.add('hidden');
+            dom.aiBadge.classList.add('hidden');
+            dom.scanTable.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-gray-400 italic">Select a stop from the timeline to audit scans.</td></tr>';
+        }
+
+        function updateMap(route) {
+            if (!map) return;
+            
+            // Cleanup
+            if (polyline) map.removeLayer(polyline);
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            // Draw Line
+            const latlngs = route.map(r => r.coords);
+            polyline = L.polyline(latlngs, {
+                color: '#4D148C',
+                weight: 3,
+                opacity: 0.8,
+                lineJoin: 'round'
+            }).addTo(map);
+
+            // Add Markers
+            const bounds = L.latLngBounds(latlngs);
+            route.forEach(stop => {
+                let cssClass = 'pin-future';
+                if(stop.status === 'completed') cssClass = 'pin-completed';
+                if(stop.status === 'alert') cssClass = 'pin-alert';
+                if(stop.status === 'active') cssClass = 'pin-completed'; // for happy path
+
+                const icon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="marker-pin ${cssClass}"></div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                const marker = L.marker(stop.coords, { icon: icon })
+                    .addTo(map)
+                    .bindPopup(`<div class="font-bold text-sm text-gray-800">${stop.name}</div>`);
+                
+                markers.push(marker);
+            });
+
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function renderTimeline(route) {
+            dom.timeline.innerHTML = '';
+            route.forEach((stop, idx) => {
+                let dotClass = 'bg-gray-300';
+                if(stop.status === 'completed' || stop.status === 'active') dotClass = 'bg-fx-purple';
+                if(stop.status === 'alert') dotClass = 'bg-fx-orange animate-pulse';
+
+                const html = `
+                    <div class="relative pl-8 cursor-pointer group" onclick="selectStop(${idx})">
+                        <div class="absolute left-0 top-1.5 w-4 h-4 rounded-full ${dotClass} border-2 border-white shadow-sm z-20"></div>
+                        <div class="mb-1 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 text-sm">${stop.name}</span>
+                            <span class="text-xs font-mono text-gray-400">${stop.type}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 mb-2">
+                            ${stop.status === 'alert' ? '<span class="text-red-600 font-bold">Action Required</span>' : 'Standard Proc.'}
+                        </div>
+                    </div>
+                `;
+                dom.timeline.insertAdjacentHTML('beforeend', html);
+            });
+            
+            // Auto-select problem node if exists
+            const alertIdx = route.findIndex(r => r.status === 'alert');
+            if (alertIdx >= 0) selectStop(alertIdx);
+        }
+
+        window.selectStop = (idx) => {
+            const awb = dom.input.value.trim();
+            const data = awbDatabase[awb] || awbDatabase['794827104829'];
+            const stop = data.route[idx];
+            let rows = '';
+            
+            if(stop.scans.length === 0) {
+                rows = '<tr><td colspan="4" class="py-4 text-center text-gray-400 italic">No telemetry data available.</td></tr>';
+            } else {
+                stop.scans.forEach(scan => {
+                    const meta = SCAN_CODES[scan.code] || { label: scan.code, icon: 'hash' };
+                    let rowClass = scan.status === 'missing' ? 'bg-red-50' : '';
+                    let textClass = scan.status === 'missing' ? 'text-red-600 font-bold' : 'text-gray-600';
+
+                    rows += `
+                        <tr class="border-b border-gray-100 ${rowClass}">
+                            <td class="py-2 pl-2 font-bold ${textClass}">${scan.code}</td>
+                            <td class="py-2 text-gray-800 flex items-center gap-2">
+                                <i class="ph ph-${meta.icon} opacity-70"></i>
+                                ${meta.label}
+                                ${scan.note ? `<span class="text-xs text-red-500 italic ml-1">- ${scan.note}</span>` : ''}
+                            </td>
+                            <td class="py-2 text-gray-500">${stop.id.split(' ')[0]}</td>
+                            <td class="py-2 text-right pr-2 font-mono text-xs ${scan.delta?.includes('+') ? 'text-red-500' : 'text-green-600'}">
+                                ${scan.delta || '--'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            dom.scanTable.innerHTML = rows;
+            
+            // Fly map
+            if(map) {
+                map.flyTo(stop.coords, 5, { animate: true });
+                if(markers[idx]) markers[idx].openPopup();
+            }
+        };
+
+        // --- AI LOGIC ---
+        async function runAIAnalysis() {
+            dom.aiContent.innerHTML = `<div class="flex flex-col items-center justify-center py-6"><div class="animate-spin h-6 w-6 border-2 border-fx-purple border-t-transparent rounded-full mb-2"></div><span class="text-xs text-fx-purple font-bold">Analyzing Telemetry...</span></div>`;
+            dom.aiBadge.classList.remove('hidden');
+
+            const awb = dom.input.value.trim();
+            const data = awbDatabase[awb] || awbDatabase['794827104829'];
+            const isDelayed = data.status === 'delayed';
+
+            // Dynamic Prompt based on current state
+            const prompt = `You are a FedEx Operations Expert.
+            Context: AWB ${awb}.
+            Status: ${data.status}.
+            Location: ${data.currentHub}.
+            Hub Load: ${data.hubCongestion}%.
+            Weather: ${data.weather}.
+            
+            Task:
+            1. Root Cause Analysis (1 sentence).
+            2. Mitigation Steps (2 bullet points).
+            3. Draft a short internal update email.
+            
+            Keep it professional and concise HTML.`;
+
+            const result = await callGemini(prompt, isDelayed, data);
+            dom.aiContent.innerHTML = `<div class="ai-output text-sm space-y-2">${result.analysis}</div>`;
+            
+            if(result.email) {
+                dom.emailSection.classList.remove('hidden');
+                dom.emailText.innerText = result.email;
+            }
+        }
+
+        async function callGemini(prompt, isDelayed, data) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const json = await response.json();
+                const text = json.candidates[0].content.parts[0].text;
+                
+                // Simple parser since we asked for HTML. In a real app we'd ask for JSON.
+                // For this demo, we'll return the raw text as analysis and extract a dummy email if needed
+                return { 
+                    analysis: text, 
+                    email: `Subject: Update on AWB ${dom.input.value}\n\nTeam,\n\nStatus: ${data.status.toUpperCase()}\nLocation: ${data.currentHub}\n\nWe are actively monitoring this shipment. ${isDelayed ? 'Recovery actions initiated.' : 'Proceeding on schedule.'}\n\n- Ops Control` 
+                };
+            } catch (e) {
+                // Fallback if API key missing/fails
+                return {
+                    analysis: isDelayed 
+                        ? `<strong>Root Cause:</strong> Sortation window missed at ${data.currentHub} due to ${data.hubCongestion}% capacity saturation.<br><strong>Action:</strong><ul><li>Initiate Hot Hatch protocol.</li><li>Route to secondary belt.</li></ul>`
+                        : `<strong>Analysis:</strong> Shipment proceeding on schedule. No anomalies detected.<br><strong>Action:</strong> Continue standard monitoring.`,
+                    email: `Subject: Update on AWB ${dom.input.value}\n\nTeam,\n\nMonitoring active. Current status: ${data.status.toUpperCase()}.\n\n- Ops Control`
+                };
+            }
+        }
+
+        window.copyEmail = () => {
+            navigator.clipboard.writeText(dom.emailText.innerText);
+            alert("Draft copied to clipboard.");
+        }
+    </script>
+</body>
+</html>
