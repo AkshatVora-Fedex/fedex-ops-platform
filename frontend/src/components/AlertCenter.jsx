@@ -270,108 +270,190 @@ const AlertCenter = () => {
         {/* Details Panel */}
         <div className="lg:col-span-2">
           {selectedAlert ? (
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-6 h-full flex flex-col">
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               {/* Alert Header */}
-              <div className="flex items-start justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold text-white ${getSeverityBadgeColor(selectedAlert.severity)}`}>
-                      {selectedAlert.severity}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(selectedAlert.status)}`}>
-                      {selectedAlert.status}
-                    </span>
+              <div className="bg-gradient-to-r from-[#4D148C] to-indigo-700 p-6 text-white">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2">AWB {selectedAlert.awb}</h2>
+                    <div className="flex items-center gap-3 text-sm opacity-90">
+                      <div className="flex items-center gap-1">
+                        <span className="material-icons text-sm">flight_takeoff</span>
+                        <span>JFK (New York)</span>
+                      </div>
+                      <span>→</span>
+                      <div className="flex items-center gap-1">
+                        <span className="material-icons text-sm">flight_land</span>
+                        <span>LHR (London)</span>
+                      </div>
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {selectedAlert.ruleName}
-                  </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    AWB: <span className="font-mono font-bold">{selectedAlert.awb}</span>
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded text-xs font-bold ${getSeverityBadgeColor(selectedAlert.severity)}`}>
+                      {selectedAlert.severity} PRIORITY
+                    </span>
+                    <button onClick={() => setSelectedAlert(null)} className="p-1 hover:bg-white/20 rounded">
+                      <span className="material-icons">close</span>
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setSelectedAlert(null)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all"
-                >
-                  <span className="material-icons">close</span>
-                </button>
-              </div>
-
-              {/* Alert Description */}
-              <div className="mb-6">
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  {selectedAlert.description}
-                </p>
-                <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold">Created</p>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
-                      {new Date(selectedAlert.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold">Last Updated</p>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
-                      {new Date(selectedAlert.updatedAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold">Category</p>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
-                      {selectedAlert.category || 'Operational'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold">Impact</p>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
-                      {selectedAlert.impactedShipments || 1} shipment(s)
-                    </p>
-                  </div>
+                <div className="bg-white/10 rounded px-3 py-2 inline-block text-xs font-bold">
+                  CURRENT STATUS: MEM HUB (DELAYED)
                 </div>
               </div>
 
-              {/* Resolution Notes */}
-              <div className="mb-6 flex-1">
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                  Resolution Notes
-                </label>
-                <textarea
-                  value={resolutionNotes}
-                  onChange={(e) => setResolutionNotes(e.target.value)}
-                  placeholder="Document the action taken, manual overrides, reroutes, or observations..."
-                  className="w-full h-24 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4D148C]"
-                />
-              </div>
+              <div className="p-6 space-y-6">
+                {/* Failure Analysis */}
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-red-600 text-white rounded p-2">
+                      <span className="material-icons">report_problem</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-red-900 dark:text-red-200 mb-2">FAILURE ANALYSIS</h3>
+                      <p className="text-sm text-red-800 dark:text-red-300">
+                        {selectedAlert.description || 'Automated scan logic detected package on belt line B4 (Domestic Sort). At Outbound, potential routing label error or mis-sort. Package is currently idle.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2">
-                {selectedAlert.status === 'OPEN' && (
-                  <button
-                    onClick={() => handleAcknowledge(selectedAlert.id)}
-                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-[#4D148C] text-[#4D148C] hover:bg-[#4D148C] hover:text-white rounded-lg font-semibold transition-all"
-                  >
-                    <span className="material-icons text-sm mr-2">check</span>
-                    Acknowledge
-                  </button>
-                )}
-                {selectedAlert.status !== 'RESOLVED' && selectedAlert.status !== 'OVERRIDDEN' && (
-                  <>
-                    <button
-                      onClick={handleResolve}
-                      disabled={!resolutionNotes.trim()}
-                      className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all"
-                    >
-                      <span className="material-icons text-sm mr-2">done</span>
-                      Resolve
-                    </button>
-                    <button
-                      onClick={() => setShowOverrideModal(true)}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold transition-all"
-                    >
-                      <span className="material-icons text-sm">security</span>
-                    </button>
-                  </>
-                )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Resolution Workspace */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="material-icons text-[#4D148C]">build_circle</span>
+                      <h3 className="font-bold text-gray-900 dark:text-white">Resolution Workspace</h3>
+                    </div>
+
+                    <div className="space-y-3 mb-4">
+                      <button className="w-full flex items-center gap-3 p-4 border-2 border-gray-300 dark:border-gray-600 hover:border-[#4D148C] dark:hover:border-[#4D148C] hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all group">
+                        <span className="material-icons text-2xl text-gray-600 group-hover:text-[#4D148C]">alt_route</span>
+                        <div className="text-left">
+                          <div className="font-bold text-gray-900 dark:text-white">Re-route Courier</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Assign new flight path</div>
+                        </div>
+                      </button>
+
+                      <button className="w-full flex items-center gap-3 p-4 border-2 border-gray-300 dark:border-gray-600 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-all group">
+                        <span className="material-icons text-2xl text-gray-600 group-hover:text-orange-600">track_changes</span>
+                        <div className="text-left">
+                          <div className="font-bold text-gray-900 dark:text-white">Manual Override</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Force update status</div>
+                        </div>
+                      </button>
+
+                      <button className="w-full flex items-center gap-3 p-4 border-2 border-gray-300 dark:border-gray-600 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all group">
+                        <span className="material-icons text-2xl text-gray-600 group-hover:text-red-600">campaign</span>
+                        <div className="text-left">
+                          <div className="font-bold text-gray-900 dark:text-white">Escalate to Hub</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Notify floor manager</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">REASON CODE</label>
+                        <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                          <option>SORT_ERR_01 (Sortation Error)</option>
+                          <option>ROUT_ERR_02 (Routing Error)</option>
+                          <option>SCAN_MISS_03 (Scan Missed)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">NEW DESTINATION HUB</label>
+                        <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm">
+                          <option>MEM (Memphis SuperHub)</option>
+                          <option>IND (Indianapolis Hub)</option>
+                          <option>OAK (Oakland Hub)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">OPERATIONAL NOTES</label>
+                        <textarea
+                          value={resolutionNotes}
+                          onChange={(e) => setResolutionNotes(e.target.value)}
+                          placeholder="Add context for the audit log..."
+                          className="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-sm resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <button className="flex-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-all text-sm">
+                        Notify Origin Station
+                      </button>
+                      <button
+                        onClick={handleResolve}
+                        disabled={!resolutionNotes.trim()}
+                        className="flex-1 px-4 py-2 bg-[#4D148C] hover:bg-[#3e0f73] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded font-bold transition-all text-sm inline-flex items-center justify-center gap-2"
+                      >
+                        <span className="material-icons text-sm">check_circle</span>
+                        Submit Resolution
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Package Specifications & History */}
+                  <div className="space-y-6">
+                    {/* Package Specs */}
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-3">PACKAGE SPECIFICATIONS</h3>
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Weight</span>
+                          <span className="font-bold text-gray-900 dark:text-white">12.4 kg</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Dimensions</span>
+                          <span className="font-bold text-gray-900 dark:text-white">40×30×25 cm</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Service</span>
+                          <span className="font-bold text-[#FF6600]">FedEx Intl Priority</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Content Type</span>
+                          <span className="font-bold text-gray-900 dark:text-white">Medical Supplies</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Resolution History */}
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-3">RESOLUTION HISTORY</h3>
+                      <div className="space-y-3">
+                        <div className="border-l-2 border-green-500 pl-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span className="font-bold text-sm text-gray-900 dark:text-white">System Alert Triggered</span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Route deviation detected at node MEM-C4</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">TODAY, 08:42 AM • AUTOMATED</p>
+                        </div>
+
+                        <div className="border-l-2 border-blue-500 pl-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span className="font-bold text-sm text-gray-900 dark:text-white">Opened by Sarah Jenkins</span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Status changed to 'Investigating'</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">TODAY, 08:15 AM</p>
+                        </div>
+
+                        <div className="border-l-2 border-gray-300 dark:border-gray-600 pl-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            <span className="font-bold text-sm text-gray-900 dark:text-white">Scan Event</span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">Arrived at Sort Facility</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">TODAY, 06:30 AM • SCANNER ID 4492</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Override Modal */}

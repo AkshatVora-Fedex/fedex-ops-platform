@@ -7,7 +7,7 @@ const csv = require('csv-parser');
  * Parses IN SPAC NSL.txt CSV file and imports into MongoDB
  */
 
-const CSV_FILE = path.join(__dirname, '..', 'IN SPAC NSL.txt');
+const CSV_FILE = path.join(__dirname, '..', '..', 'IN SPAC NSL.txt');
 const OUTPUT_FILE = path.join(__dirname, '..', 'data', 'awb-historical.json');
 
 async function importAWBData() {

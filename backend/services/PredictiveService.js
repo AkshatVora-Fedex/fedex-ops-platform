@@ -10,6 +10,39 @@ class PredictiveService {
     let delayProbability = 0;
     const reasons = [];
 
+    // For historical data, use actual status
+    if (consignment.isHistorical) {
+      const statusMap = {
+        'OnTime': 10,
+        'IN_TRANSIT': 35,
+        'WDL': 65,
+        'EWDL': 85,
+        'DELAYED': 75,
+        'EXCEPTION': 90,
+        'RDL': 70,
+        'ERDL': 95
+      };
+      
+      delayProbability = statusMap[consignment.status] || 35;
+      
+      if (delayProbability > 50) {
+        reasons.push(`Historical record shows ${consignment.status} status`);
+      }
+      
+      return {
+        willBeDelayed: delayProbability > 50,
+        delayProbability: Math.round(delayProbability),
+        riskLevel: delayProbability > 70 ? 'CRITICAL' : delayProbability > 50 ? 'HIGH' : delayProbability > 30 ? 'MEDIUM' : 'LOW',
+        reasons,
+        isHistorical: true,
+        metrics: {
+          status: consignment.status,
+          service: consignment.serviceType,
+          region: consignment.region
+        }
+      };
+    }
+
     // Factor 1: Check elapsed time vs expected time
     const createdAt = moment(consignment.createdAt);
     const estimatedDelivery = moment(consignment.estimatedDelivery);
