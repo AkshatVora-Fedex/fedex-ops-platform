@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedEx OpsPulse | Analytics & Insights</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Icon Font (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- FedEx Brand Identity (Frozen) --- */
+        :root {
+            --fx-purple: #4D148C;
+            --fx-orange: #FF6600;
+            --fx-bg: #F2F4F8;
+            --fx-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fx-bg);
+            color: #333;
+        }
+
+        /* --- Utility Classes --- */
+        .text-fx-purple { color: var(--fx-purple); }
+        .bg-fx-purple { background-color: var(--fx-purple); }
+        .text-fx-orange { color: var(--fx-orange); }
+        .bg-fx-orange { background-color: var(--fx-orange); }
+
+        .btn-primary {
+            background-color: var(--fx-orange);
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #e55b00;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Components --- */
+        .card {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #E5E7EB;
+        }
+        .card:hover { border-color: #D1D5DB; }
+
+        /* --- Loading Overlay --- */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+        #loadingOverlay.hidden-overlay { opacity: 0; pointer-events: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="w-16 h-16 border-4 border-fx-purple border-t-fx-orange rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium animate-pulse">Compiling Historical Datasets...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-fx-purple text-white shadow-md z-50 sticky top-0">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <div class="font-black text-2xl tracking-tighter select-none">
+                    <span class="text-white">Fed</span><span class="text-fx-orange">Ex</span>
+                    <span class="text-xs font-normal text-gray-300 ml-1 tracking-normal opacity-80">OpsPulse</span>
+                </div>
+                <div class="hidden md:flex h-6 w-px bg-purple-700"></div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+<a href="file:///C:/Users/9787080/Downloads/WEB/T1.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Shipment Control Tower</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T2.html#" class="text-purple-300 hover:text-white transition-colors">Global Command</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T3.html#" class="text-purple-300 hover:text-white transition-colors">Shipment Watch</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T4.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Hub Pulse</a>
+                    <a href="#" class="text-white border-b-2 border-fx-orange pb-0.5">Analytics & Insights</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <select class="bg-purple-800 border-none text-xs text-white rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-fx-orange cursor-pointer">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                    <option>Quarter to Date</option>
+                </select>
+                <button class="flex items-center px-3 py-1.5 bg-white text-fx-purple rounded text-xs font-bold hover:bg-gray-100 transition-colors">
+                    <i class="ph ph-download-simple text-lg mr-2"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 space-y-6">
+
+        <!-- Executive Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="card p-4 border-l-4 border-l-green-500">
+                <p class="text-xs text-gray-500 uppercase font-bold">On-Time Performance</p>
+                <div class="flex items-end justify-between">
+                    <h2 class="text-3xl font-black text-gray-800 mt-1">96.4%</h2>
+                    <span class="text-xs font-bold text-green-600 mb-1 flex items-center"><i class="ph ph-trend-up mr-1"></i> 1.2%</span>
+                </div>
+            </div>
+            <div class="card p-4 border-l-4 border-l-red-500">
+                <p class="text-xs text-gray-500 uppercase font-bold">Exception Rate</p>
+                <div class="flex items-end justify-between">
+                    <h2 class="text-3xl font-black text-gray-800 mt-1">3.2%</h2>
+                    <span class="text-xs font-bold text-green-600 mb-1 flex items-center"><i class="ph ph-trend-down mr-1"></i> 0.5%</span>
+                </div>
+            </div>
+            <div class="card p-4 border-l-4 border-l-purple-500">
+                <p class="text-xs text-gray-500 uppercase font-bold">Avg Transit Time</p>
+                <div class="flex items-end justify-between">
+                    <h2 class="text-3xl font-black text-gray-800 mt-1">42h</h2>
+                    <span class="text-xs font-bold text-gray-400 mb-1">Global Avg</span>
+                </div>
+            </div>
+            <div class="card p-4 border-l-4 border-l-orange-500">
+                <p class="text-xs text-gray-500 uppercase font-bold">Model Accuracy</p>
+                <div class="flex items-end justify-between">
+                    <h2 class="text-3xl font-black text-gray-800 mt-1">89%</h2>
+                    <span class="text-xs font-bold text-green-600 mb-1">High Confidence</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Trend & Root Cause -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Performance Trend Chart -->
+            <div class="lg:col-span-2 card p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-800 text-sm uppercase">Performance Trend (30 Days)</h3>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-fx-purple mr-1"></span> Actual</span>
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-gray-300 mr-1"></span> Target</span>
+                    </div>
+                </div>
+                <div class="h-64">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Root Cause Donut -->
+            <div class="lg:col-span-1 card p-5">
+                <h3 class="font-bold text-gray-800 text-sm uppercase mb-4">Primary Delay Drivers</h3>
+                <div class="h-48 relative">
+                    <canvas id="rootCauseChart"></canvas>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>Hub Capacity</span>
+                        <span class="font-bold text-gray-700">42%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-blue-400 mr-2"></span>Weather</span>
+                        <span class="font-bold text-gray-700">28%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>Customs</span>
+                        <span class="font-bold text-gray-700">18%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Heatmap & AI Insights -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Failure Heatmap Table -->
+            <div class="card p-5">
+                <h3 class="font-bold text-gray-800 text-sm uppercase mb-4">Risk Heatmap: Failures by Hour/Day</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-center border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 font-medium">
+                                <th class="p-2 text-left">Day</th>
+                                <th class="p-2">00-06</th>
+                                <th class="p-2">06-12</th>
+                                <th class="p-2">12-18</th>
+                                <th class="p-2">18-24</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-600 font-bold">
+                            <tr>
+                                <td class="p-2 text-left font-normal text-gray-500">Mon</td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">2%</div></td>
+                                <td class="p-2"><div class="bg-yellow-100 text-yellow-700 rounded py-1">5%</div></td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">3%</div></td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">1%</div></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 text-left font-normal text-gray-500">Wed</td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">1%</div></td>
+                                <td class="p-2"><div class="bg-red-100 text-red-700 rounded py-1">12%</div></td>
+                                <td class="p-2"><div class="bg-orange-100 text-orange-700 rounded py-1">8%</div></td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">2%</div></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 text-left font-normal text-gray-500">Fri</td>
+                                <td class="p-2"><div class="bg-green-100 text-green-700 rounded py-1">2%</div></td>
+                                <td class="p-2"><div class="bg-orange-100 text-orange-700 rounded py-1">7%</div></td>
+                                <td class="p-2"><div class="bg-red-100 text-red-700 rounded py-1">15%</div></td>
+                                <td class="p-2"><div class="bg-yellow-100 text-yellow-700 rounded py-1">6%</div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2 italic">* Percentage of volume missing sort cutoff.</p>
+            </div>
+
+            <!-- AI Strategic Insight -->
+            <div class="card p-5 border border-purple-200 bg-gradient-to-br from-white to-purple-50">
+                <div class="flex items-center mb-4">
+                    <div class="p-2 bg-white rounded-full shadow-sm text-fx-purple mr-3">
+                        <i class="ph ph-brain text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-sm uppercase">Gemini Strategic Assessment</h3>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <i class="ph ph-warning-circle text-red-500 text-lg mr-2 mt-0.5"></i>
+                        <div>
+                            <p class="text-sm font-bold text-gray-700">Friday Afternoon Bottleneck</p>
+                            <p class="text-xs text-gray-500 mt-1">Data indicates a consistent 15% failure rate at IND Hub on Fridays between 12:00-18:00. This correlates with peak ground volume injection.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="ph ph-lightbulb text-yellow-500 text-lg mr-2 mt-0.5"></i>
+                        <div>
+                            <p class="text-sm font-bold text-gray-700">Recommendation: Shift Stagger</p>
+                            <p class="text-xs text-gray-500 mt-1">Increasing shift overlap by 1 hour on Fridays could reduce processing backlog by an estimated 8% based on predictive modeling.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="mt-6 w-full py-2 bg-white border border-purple-200 text-fx-purple text-xs font-bold rounded shadow-sm hover:bg-purple-50 transition-colors">
+                    Download Full Strategic Report
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden-overlay');
+                initCharts();
+            }, 800);
+        });
+
+        function initCharts() {
+            // Trend Chart
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 15}, (_, i) => `Jan ${i+1}`),
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: Array(15).fill(98),
+                            borderColor: '#D1D5DB',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'Actual',
+                            data: [96, 97, 95, 94, 96, 98, 97, 95, 92, 94, 96, 97, 98, 97, 96],
+                            borderColor: '#4D148C',
+                            backgroundColor: 'rgba(77, 20, 140, 0.05)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 90, max: 100, grid: { borderDash: [2, 2] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Root Cause Donut
+            const ctxRoot = document.getElementById('rootCauseChart').getContext('2d');
+            new Chart(ctxRoot, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hub Capacity', 'Weather', 'Customs', 'Mechanical', 'Other'],
+                    datasets: [{
+                        data: [42, 28, 18, 7, 5],
+                        backgroundColor: ['#EF4444', '#60A5FA', '#F59E0B', '#9CA3AF', '#D1D5DB'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '75%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>

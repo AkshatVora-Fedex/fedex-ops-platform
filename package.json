@@ -1,0 +1,35 @@
+{
+  "name": "fedex-ops-platform",
+  "version": "1.0.0",
+  "description": "FedEx Operations Proactivity Platform - Predictive Analytics & Real-time Tracking",
+  "author": "FedEx Operations Technology",
+  "license": "PROPRIETARY",
+  "keywords": [
+    "fedex",
+    "operations",
+    "tracking",
+    "predictive",
+    "analytics",
+    "consignment",
+    "delivery",
+    "alerts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fedex/ops-platform.git"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend start\"",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend start",
+    "build": "npm --prefix frontend run build && npm --prefix backend run build",
+    "test": "concurrently \"npm --prefix backend run test\" \"npm --prefix frontend run test\""
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedEx OpsPulse | Hub Pulse</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Icon Font (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- FedEx Brand Identity (Frozen) --- */
+        :root {
+            --fx-purple: #4D148C;
+            --fx-orange: #FF6600;
+            --fx-bg: #F2F4F8;
+            --fx-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fx-bg);
+            color: #333;
+        }
+
+        /* --- Utility Classes --- */
+        .text-fx-purple { color: var(--fx-purple); }
+        .bg-fx-purple { background-color: var(--fx-purple); }
+        .text-fx-orange { color: var(--fx-orange); }
+        .bg-fx-orange { background-color: var(--fx-orange); }
+
+        .btn-primary {
+            background-color: var(--fx-orange);
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #e55b00;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Card Components --- */
+        .hub-card {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-top: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .hub-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        
+        .status-green { border-top-color: #10B981; }
+        .status-yellow { border-top-color: #F59E0B; }
+        .status-red { border-top-color: #EF4444; }
+
+        .load-bar-bg { background-color: #F3F4F6; height: 8px; border-radius: 9999px; overflow: hidden; }
+        .load-bar-fill { height: 100%; border-radius: 9999px; transition: width 1s ease-out; }
+
+        /* --- Animations --- */
+        @keyframes pulse-opacity {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-blink { animation: pulse-opacity 2s infinite; }
+
+        /* --- Loading Overlay --- */
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+        #loadingOverlay.hidden-overlay { opacity: 0; pointer-events: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="w-16 h-16 border-4 border-fx-purple border-t-fx-orange rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 font-medium animate-pulse">Connecting to IoT Sensors...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-fx-purple text-white shadow-md z-50 sticky top-0">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <div class="font-black text-2xl tracking-tighter select-none">
+                    <span class="text-white">Fed</span><span class="text-fx-orange">Ex</span>
+                    <span class="text-xs font-normal text-gray-300 ml-1 tracking-normal opacity-80">OpsPulse</span>
+                </div>
+                <div class="hidden md:flex h-6 w-px bg-purple-700"></div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+		    <a href="file:///C:/Users/9787080/Downloads/WEB/T1.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Shipment Control Tower</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T2.html#" class="text-purple-300 hover:text-white transition-colors">Global Command</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T3.html#" class="text-purple-300 hover:text-white transition-colors">Shipment Watch</a>
+                    <a href="file:///C:/Users/9787080/Downloads/WEB/T4.html#" class="text-white border-b-2 border-fx-orange pb-0.5">Hub Pulse</a>
+                </nav>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                 <button onclick="runNetworkBalancer()" class="hidden md:flex items-center px-4 py-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded text-xs font-bold transition-all shadow-md transform hover:scale-105">
+                    <i class="ph ph-scales text-lg mr-2"></i>
+                    AI Network Balancer
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 space-y-6">
+
+        <!-- Top Bar: Network Health -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold">Avg Network Load</p>
+                    <h2 class="text-2xl font-black text-gray-800">72%</h2>
+                </div>
+                <div class="h-10 w-10 bg-green-50 rounded-full flex items-center justify-center text-green-600"><i class="ph ph-activity text-xl"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold">Total Backlog</p>
+                    <h2 class="text-2xl font-black text-red-600">42k <span class="text-sm font-medium text-gray-400">pkgs</span></h2>
+                </div>
+                <div class="h-10 w-10 bg-red-50 rounded-full flex items-center justify-center text-red-600 animate-pulse"><i class="ph ph-warning-octagon text-xl"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold">Active Staffing</p>
+                    <h2 class="text-2xl font-black text-gray-800">12,405</h2>
+                </div>
+                <div class="h-10 w-10 bg-purple-50 rounded-full flex items-center justify-center text-fx-purple"><i class="ph ph-users-three text-xl"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold">Weather Risk</p>
+                    <h2 class="text-2xl font-black text-orange-500">High</h2>
+                </div>
+                <div class="h-10 w-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500"><i class="ph ph-cloud-snow text-xl"></i></div>
+            </div>
+        </div>
+
+        <!-- AI Balancer Output (Hidden Initially) -->
+        <div id="aiBalancerResult" class="hidden bg-white border-l-4 border-fx-purple p-6 rounded shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-5"><i class="ph ph-brain text-9xl"></i></div>
+            <div class="relative z-10">
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 rounded-full bg-fx-purple text-white flex items-center justify-center mr-3 font-bold"><i class="ph ph-sparkle-fill"></i></div>
+                    <h3 class="text-lg font-bold text-gray-800">Gemini Network Optimization Strategy</h3>
+                    <button onclick="closeAI()" class="ml-auto text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+                </div>
+                <div id="aiText" class="prose prose-sm max-w-none text-gray-600"></div>
+                <div class="mt-4 flex gap-3">
+                    <button class="px-4 py-2 bg-fx-purple text-white text-sm font-bold rounded shadow-sm hover:bg-purple-800">Execute Re-Route</button>
+                    <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded hover:bg-gray-50">Simulate Impact</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hub Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="hubGrid">
+            <!-- Hubs injected by JS -->
+        </div>
+
+    </main>
+
+    <script>
+        const apiKey = ""; // System provided
+        
+        // Hub Data
+        const hubs = [
+            { 
+                code: 'MEM', name: 'Memphis SuperHub', region: 'Americas', status: 'ok', 
+                load: 78, capacity: '3.5M', weather: 'Clear', temp: '12°C',
+                inbound: 'On Time', outbound: 'On Time', icon: 'sun'
+            },
+            { 
+                code: 'IND', name: 'Indianapolis Hub', region: 'Americas', status: 'critical', 
+                load: 94, capacity: '1.2M', weather: 'Heavy Snow', temp: '-4°C',
+                inbound: 'Delayed (+2h)', outbound: 'Halted', icon: 'snowflake'
+            },
+            { 
+                code: 'CDG', name: 'Paris Charles de Gaulle', region: 'EMEA', status: 'warn', 
+                load: 82, capacity: '0.9M', weather: 'Light Rain', temp: '8°C',
+                inbound: 'Delayed (+15m)', outbound: 'On Time', icon: 'cloud-rain'
+            },
+            { 
+                code: 'DXB', name: 'Dubai International', region: 'MEA', status: 'ok', 
+                load: 65, capacity: '0.6M', weather: 'Sunny', temp: '32°C',
+                inbound: 'On Time', outbound: 'On Time', icon: 'sun'
+            },
+            { 
+                code: 'CAN', name: 'Guangzhou Baiyun', region: 'APAC', status: 'ok', 
+                load: 71, capacity: '1.1M', weather: 'Cloudy', temp: '24°C',
+                inbound: 'On Time', outbound: 'On Time', icon: 'cloud'
+            },
+            { 
+                code: 'EWR', name: 'Newark Liberty', region: 'Americas', status: 'ok', 
+                load: 45, capacity: '0.8M', weather: 'Clear', temp: '5°C',
+                inbound: 'On Time', outbound: 'On Time', icon: 'moon'
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHubs();
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden-overlay');
+            }, 600);
+        });
+
+        function renderHubs() {
+            const grid = document.getElementById('hubGrid');
+            grid.innerHTML = '';
+
+            hubs.forEach(hub => {
+                // Style Logic
+                let statusColor = 'green';
+                let statusText = 'OPERATIONAL';
+                if (hub.status === 'warn') { statusColor = 'yellow'; statusText = 'WARNING'; }
+                if (hub.status === 'critical') { statusColor = 'red'; statusText = 'CRITICAL'; }
+
+                const bgClass = `status-${statusColor}`;
+                const textClass = `text-${statusColor}-600`;
+                const barClass = `bg-${statusColor}-500`;
+                const badgeClass = `bg-${statusColor}-100 text-${statusColor}-700`;
+
+                // Card HTML
+                const html = `
+                    <div class="hub-card ${bgClass} p-5 flex flex-col h-full">
+                        <!-- Header -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">${hub.name}</h3>
+                                <p class="text-xs text-gray-500 font-mono font-bold">${hub.code} • ${hub.region}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded text-[10px] font-bold tracking-wide ${badgeClass}">${statusText}</span>
+                        </div>
+
+                        <!-- Load Meter -->
+                        <div class="mb-6">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-500 font-medium">Sortation Capacity</span>
+                                <span class="font-bold ${textClass}">${hub.load}%</span>
+                            </div>
+                            <div class="load-bar-bg">
+                                <div class="load-bar-fill ${barClass}" style="width: ${hub.load}%"></div>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1 text-right">Max Vol: ${hub.capacity} pkgs/hr</p>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 gap-3 mb-4 flex-grow">
+                            <div class="bg-gray-50 p-2 rounded border border-gray-100">
+                                <p class="text-[10px] text-gray-400 uppercase font-bold">Weather</p>
+                                <div class="flex items-center mt-1">
+                                    <i class="ph ph-${hub.icon} text-lg mr-2 text-gray-600"></i>
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-800">${hub.weather}</p>
+                                        <p class="text-[10px] text-gray-500">${hub.temp}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded border border-gray-100">
+                                <p class="text-[10px] text-gray-400 uppercase font-bold">Flight Ops</p>
+                                <div class="mt-1">
+                                    <p class="text-[10px] text-gray-600 flex justify-between"><span>In:</span> <span class="font-bold">${hub.inbound}</span></p>
+                                    <p class="text-[10px] text-gray-600 flex justify-between"><span>Out:</span> <span class="font-bold">${hub.outbound}</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Footer -->
+                        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-xs text-gray-400"><i class="ph ph-clock"></i> Live</span>
+                            <button class="text-xs font-bold text-fx-purple hover:text-orange-600 flex items-center transition-colors">
+                                View Telemetry <i class="ph ph-caret-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        // --- AI LOGIC ---
+        async function runNetworkBalancer() {
+            const container = document.getElementById('aiBalancerResult');
+            const textBox = document.getElementById('aiText');
+            
+            container.classList.remove('hidden');
+            textBox.innerHTML = `<div class="flex items-center text-fx-purple py-4"><i class="ph ph-spinner animate-spin mr-2 text-xl"></i> Calculating Optimal Route Distribution...</div>`;
+
+            const prompt = `
+                Role: Logistics AI.
+                Problem: IND Hub at 94% capacity (Critical) due to Snow. EWR Hub at 45% capacity (Underutilized).
+                Goal: Balance load to prevent SLA failure.
+                Output: 
+                1. Strategy Summary.
+                2. 3 Action Steps (bullet points).
+                3. Predicted Impact (e.g., "-15% load at IND").
+                Format: HTML.
+            `;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            try {
+                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                const json = await res.json();
+                textBox.innerHTML = json.candidates[0].content.parts[0].text;
+            } catch (e) {
+                // Fallback
+                setTimeout(() => {
+                    textBox.innerHTML = `
+                        <p class="font-bold text-gray-800 mb-2">Strategy: Dynamic Load Shedding (IND &#8594; EWR)</p>
+                        <ul class="list-disc pl-5 space-y-1 mb-3">
+                            <li><strong>Divert:</strong> Re-route 15% of inbound ground volume (destined for East Coast) from Indianapolis to Newark Gateway.</li>
+                            <li><strong>Transport:</strong> Activate 12 reserve linehaul trucks for IND-EWR shuttle.</li>
+                            <li><strong>Alert:</strong> Notify EWR Sort Manager to prep for +15k units/hr surge.</li>
+                        </ul>
+                        <div class="flex items-center text-green-600 font-bold bg-green-50 p-2 rounded">
+                            <i class="ph ph-trend-down mr-2"></i> Predicted Impact: IND Load reduces to 79% (Safe)
+                        </div>
+                    `;
+                }, 1000);
+            }
+        }
+
+        function closeAI() {
+            document.getElementById('aiBalancerResult').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

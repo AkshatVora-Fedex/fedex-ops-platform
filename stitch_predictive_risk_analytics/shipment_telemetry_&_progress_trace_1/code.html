@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shipment Telemetry &amp; Progress Trace | FedEx Internal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-color: #4D148C;
+            --secondary-color: #FF6600;
+        }
+        @layer base {
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                display: inline-block;
+                line-height: 1;
+                text-transform: none;
+                letter-spacing: normal;
+                word-wrap: normal;
+                white-space: nowrap;
+                direction: ltr;
+            }
+        }
+    </style>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4D148C",
+                        secondary: "#FF6600",
+                        fedex: {
+                            purple: "#4D148C",
+                            orange: "#FF6600",
+                        },
+                        background: "#F8F9FA",
+                        surface: "#FFFFFF",
+                        border: "#E2E8F0",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-background text-slate-900 font-sans antialiased">
+<nav class="bg-primary text-white shadow-md sticky top-0 z-50">
+<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center space-x-6">
+<div class="flex-shrink-0 flex items-center">
+<img alt="FedEx Logo" class="h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj3EKrlfj3Cy4oLsM83lRHIUwCb4LY6BwIsJkAFfS9ztU9mL9AKPivXg4nSqKJcoLKt5qVotIzc-qlp-vuKOQcbFZCZfabA6I9iXsygLX9hAYWyMPLaE0AHBe-e-PjdAcQ_qvx_noMzevsz0qfZfRhTWe6Kl5M4uZSDWnoOfqJFz--74UX8Yk7JVkpmHlTfDf-M2eFzXQsw5oM9fDT1g043tnBbEI4oyC_xjjqbitEPGKC2KdGC7KWCLmcdZXu4zFIOCzLvgM8t74k"/>
+<span class="ml-4 text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 border-l border-white/20 pl-4 h-5 flex items-center">Planning &amp; Engineering</span>
+</div>
+<div class="hidden lg:block">
+<div class="flex items-center space-x-1">
+<a class="bg-white/10 px-4 py-2 rounded text-sm font-semibold transition" href="#">Telemetry</a>
+<a class="px-4 py-2 rounded text-sm font-medium hover:bg-white/10 transition" href="#">Route Planner</a>
+<a class="px-4 py-2 rounded text-sm font-medium hover:bg-white/10 transition" href="#">Network Health</a>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<div class="relative hidden xl:block">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-white/60 text-lg">search</span>
+</div>
+<input class="block w-72 pl-10 pr-3 py-1.5 border-none bg-white/10 text-white placeholder-white/50 focus:ring-1 focus:ring-white/30 rounded text-sm transition" placeholder="Search AWB or Route ID..." type="text"/>
+</div>
+<div class="flex items-center space-x-3 border-l border-white/20 pl-6">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold leading-tight">Ops Manager</p>
+<p class="text-[10px] opacity-70 leading-tight">John Doe</p>
+</div>
+<div class="h-9 w-9 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm shadow-inner">JD</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary">local_shipping</span>
+<h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Shipment Telemetry: <span class="text-primary font-mono ml-2">AWB-789210455</span>
+</h1>
+</div>
+<div class="flex flex-wrap items-center gap-3 text-sm">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+<span class="w-1.5 h-1.5 mr-2 bg-red-600 rounded-full animate-pulse"></span> DELAY RISK DETECTED
+                    </span>
+<span class="text-slate-300">|</span>
+<span class="text-slate-500 font-medium">Service: <span class="text-slate-900 font-bold">International Priority</span></span>
+<span class="text-slate-300">|</span>
+<span class="text-slate-500 font-medium">Route: <span class="text-slate-900 font-bold">MEM &gt; CDG &gt; DXB</span></span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center px-5 py-2.5 border border-slate-200 rounded font-bold text-sm text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition">
+<span class="material-symbols-outlined text-lg mr-2">history</span> Audit Log
+                </button>
+<button class="flex items-center justify-center px-6 py-2.5 rounded font-bold text-sm text-white bg-primary hover:brightness-110 shadow-lg shadow-primary/20 transition">
+<span class="material-symbols-outlined text-lg mr-2">notification_important</span> Escalate
+                </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 space-y-8">
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+<h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-slate-400 text-xl">map</span> Live Route Visualization
+                        </h2>
+<div class="flex items-center space-x-4 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+<div class="flex items-center"><span class="w-3 h-0.5 bg-slate-400 mr-2"></span> Planned</div>
+<div class="flex items-center"><span class="w-3 h-0.5 bg-secondary mr-2"></span> Actual</div>
+<div class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Live Unit</div>
+</div>
+</div>
+<div class="relative h-[480px] bg-slate-50 w-full group overflow-hidden">
+<img alt="Map background" class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5L2qG5usj0vPzBOOZFzxgf-CTYBmaCMsb2qm4DCkdqK9kuXnoAOdAcssIMn2i21EKbYzItDG1jgKqNMq1TM9n0jukIrFzDVwxtqso-0bEOHC_RJYJ-sTUI820ACZ__eHOfN07ith1aUJ6EE0RlpTsD7Usb9diTZgJpYLTjBnxVu_7xGSgHeM1GwBNYK6KEIOOUQ_8QP49_qu_DMxj457VBcCf9-BQ-f46w2v19ZprVWzDQBJXZloKOYL0nFKWAQWoVfXzswyeVMXk"/>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 10;">
+<path d="M 100 200 Q 350 120 600 220 T 900 300" fill="none" stroke="#94A3B8" stroke-dasharray="8,8" stroke-width="2.5"></path>
+<path d="M 100 200 Q 350 130 580 225" fill="none" stroke="#FF6600" stroke-linecap="round" stroke-width="4"></path>
+<circle cx="580" cy="225" fill="#10B981" r="6" stroke="white" stroke-width="3">
+<animate attributeName="r" dur="2.5s" repeatCount="indefinite" values="6;9;6"></animate>
+</circle>
+<circle cx="100" cy="200" fill="#334155" r="5"></circle>
+<text class="text-[11px] font-black fill-slate-900" x="100" y="225">MEM (Origin)</text>
+<circle cx="900" cy="300" fill="#334155" r="5"></circle>
+<text class="text-[11px] font-black fill-slate-900" x="840" y="325">DXB (Dest)</text>
+</svg>
+<div class="absolute bottom-6 left-6 bg-white shadow-xl border border-slate-200 p-5 rounded-lg w-72">
+<div class="grid grid-cols-2 gap-y-4">
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Current Speed</p>
+<p class="text-xl font-black text-slate-900 font-mono">458 <span class="text-xs">kts</span></p>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Altitude</p>
+<p class="text-xl font-black text-slate-900 font-mono">32,000 <span class="text-xs">ft</span></p>
+</div>
+<div class="col-span-2 pt-3 border-t border-slate-100">
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">ETA Variance</p>
+<p class="text-xl font-black text-red-600 font-mono">+45m <span class="text-xs font-bold text-red-400">(DELAY)</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+<h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-slate-400 text-xl">timeline</span> Progress Timeline
+                        </h2>
+<span class="text-[10px] font-black uppercase bg-slate-200 text-slate-600 px-2 py-1 rounded">UTC Time Zone</span>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-slate-100">
+<thead class="bg-slate-50/30">
+<tr>
+<th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest" scope="col">Milestone</th>
+<th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest" scope="col">Planned (UTC)</th>
+<th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest" scope="col">Actual (UTC)</th>
+<th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest" scope="col">Variance</th>
+<th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest" scope="col">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="hover:bg-slate-50 transition">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded bg-green-50 flex items-center justify-center text-green-600 border border-green-100">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-black text-slate-900">PUX</div>
+<div class="text-xs text-slate-500">Pick-up Executed</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-500 font-mono">10 OCT 08:00</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-900 font-mono font-bold">10 OCT 08:05</td>
+<td class="px-6 py-5 whitespace-nowrap"><span class="text-xs font-bold text-amber-600">+5m</span></td>
+<td class="px-6 py-5 whitespace-nowrap">
+<span class="px-2.5 py-1 text-[10px] font-black uppercase rounded bg-green-100 text-green-700 border border-green-200">Completed</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded bg-green-50 flex items-center justify-center text-green-600 border border-green-100">
+<span class="material-symbols-outlined text-xl">flight_takeoff</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-black text-slate-900">DEP</div>
+<div class="text-xs text-slate-500">Departed MEM Hub</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-500 font-mono">10 OCT 14:30</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-900 font-mono font-bold">10 OCT 14:45</td>
+<td class="px-6 py-5 whitespace-nowrap"><span class="text-xs font-bold text-amber-600">+15m</span></td>
+<td class="px-6 py-5 whitespace-nowrap">
+<span class="px-2.5 py-1 text-[10px] font-black uppercase rounded bg-green-100 text-green-700 border border-green-200">Completed</span>
+</td>
+</tr>
+<tr class="bg-red-50/50 hover:bg-red-50 transition">
+<td class="px-6 py-5 whitespace-nowrap border-l-4 border-red-500">
+<div class="flex items-center">
+<div class="h-10 w-10 rounded bg-red-100 flex items-center justify-center text-red-600 border border-red-200">
+<span class="material-symbols-outlined text-xl">flight_land</span>
+</div>
+<div class="ml-4">
+<div class="text-sm font-black text-slate-900">ARV</div>
+<div class="text-xs text-slate-500">Arrival CDG Hub</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-500 font-mono">11 OCT 02:00</td>
+<td class="px-6 py-5 whitespace-nowrap text-sm text-slate-400 font-mono font-bold italic">-- -- --:--</td>
+<td class="px-6 py-5 whitespace-nowrap"><span class="text-xs font-black text-red-600">+45m EST</span></td>
+<td class="px-6 py-5 whitespace-nowrap">
+<span class="px-2.5 py-1 text-[10px] font-black uppercase rounded bg-secondary/10 text-secondary border border-secondary/20">In Transit</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 space-y-8">
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+<h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-slate-400 text-xl">fact_check</span> Scan Validation
+                        </h2>
+<span class="text-[10px] font-black text-slate-400 uppercase">3/5 Complete</span>
+</div>
+<div class="p-6 space-y-6">
+<div class="flex items-start">
+<span class="material-symbols-outlined text-green-500 text-2xl">check_circle</span>
+<div class="ml-4">
+<p class="text-sm font-black text-slate-900 leading-none">Origin Physical Scan</p>
+<p class="text-[11px] text-slate-500 mt-1">Scanned by AGT-442 at MEM-GATE-4</p>
+</div>
+</div>
+<div class="flex items-start">
+<span class="material-symbols-outlined text-green-500 text-2xl">check_circle</span>
+<div class="ml-4">
+<p class="text-sm font-black text-slate-900 leading-none">Customs Release (US)</p>
+<p class="text-[11px] text-slate-500 mt-1">Automated clearance via FTZ system</p>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-red-50 border border-red-100 flex items-start">
+<span class="material-symbols-outlined text-red-600 text-2xl">error</span>
+<div class="ml-4">
+<p class="text-sm font-black text-red-800 leading-none">CDG Sort Inductor Scan</p>
+<p class="text-[11px] text-red-600 font-bold mt-1.5 uppercase tracking-wide">MISSING - ANTICIPATED DELAY</p>
+<p class="text-[10px] text-red-500 mt-1">Note: Hub load is currently at 98% capacity.</p>
+</div>
+</div>
+<div class="flex items-start opacity-40">
+<span class="material-symbols-outlined text-slate-300 text-2xl">radio_button_unchecked</span>
+<div class="ml-4">
+<p class="text-sm font-black text-slate-900 leading-none">Delivery Van Load</p>
+<p class="text-[11px] text-slate-500 mt-1">Pending arrival at DXB Hub</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+<h2 class="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-slate-400 text-xl">edit_note</span> Operator Notes
+                        </h2>
+</div>
+<div class="p-6">
+<div class="bg-amber-50 p-4 rounded-lg border border-amber-100 mb-6">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-black text-amber-800 uppercase tracking-widest bg-amber-200/50 px-2 py-0.5 rounded">System Alert</span>
+<span class="text-[10px] text-amber-600 font-bold">10 OCT 14:00</span>
+</div>
+<p class="text-xs text-amber-900 leading-relaxed font-medium">
+                                Weather impact reported over Atlantic corridor. Rerouting algorithm suggested southern track but pilot maintained vector for fuel efficiency.
+                            </p>
+</div>
+<div class="space-y-3">
+<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest" for="comment">Add Observation</label>
+<textarea class="block w-full text-sm border-slate-200 rounded-lg p-3 bg-slate-50/50 focus:ring-primary focus:border-primary transition" id="comment" placeholder="Log operational anomaly or manual override reason..." rows="4"></textarea>
+<div class="flex justify-end">
+<button class="px-5 py-2 rounded font-bold text-sm text-white bg-primary hover:brightness-110 shadow-lg shadow-primary/10 transition" type="button">
+                                    Save Note
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-center">
+<div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Package Weight</div>
+<div class="text-2xl font-black text-slate-900">4.2 <span class="text-xs">kg</span></div>
+</div>
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 text-center">
+<div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Priority Level</div>
+<div class="text-2xl font-black text-red-600 uppercase">Critical</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

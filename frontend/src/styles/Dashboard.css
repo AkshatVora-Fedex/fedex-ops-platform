@@ -1,0 +1,203 @@
+.dashboard-container {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.dashboard-container h1 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.metric-card {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.metric-card h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #4a148c;
+}
+
+.metric-value.status-transit {
+  color: #1565c0;
+}
+
+.metric-value.status-delivered {
+  color: #2e7d32;
+}
+
+.metric-value.warning {
+  color: #d32f2f;
+}
+
+.metric-card.at-risk {
+  border-left: 4px solid #d32f2f;
+}
+
+/* Alerts Section */
+.alerts-section {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alerts-section h2 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.alert-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.alert-card {
+  padding: 20px;
+  border-radius: 6px;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+}
+
+.alert-card.critical {
+  background-color: #d32f2f;
+}
+
+.alert-card.high {
+  background-color: #f57c00;
+}
+
+.alert-card.medium {
+  background-color: #fbc02d;
+  color: #333;
+}
+
+.alert-card.low {
+  background-color: #388e3c;
+}
+
+.alert-count {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.alert-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Risk Distribution */
+.risk-distribution {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.risk-distribution h2 {
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+.risk-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.risk-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.risk-label {
+  min-width: 80px;
+  font-weight: 500;
+}
+
+.risk-bar {
+  flex: 1;
+  height: 30px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.risk-bar div {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.risk-bar.critical div {
+  background-color: #d32f2f;
+}
+
+.risk-bar.high div {
+  background-color: #f57c00;
+}
+
+.risk-bar.medium div {
+  background-color: #fbc02d;
+}
+
+.risk-count {
+  min-width: 40px;
+  text-align: right;
+  font-weight: bold;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container h1 {
+    font-size: 24px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+}

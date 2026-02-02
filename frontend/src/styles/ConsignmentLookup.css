@@ -1,0 +1,114 @@
+.lookup-container {
+  max-width: 600px;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lookup-container h2 {
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.lookup-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.awb-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.awb-input:focus {
+  outline: none;
+  border-color: #4a148c;
+}
+
+.lookup-form button {
+  padding: 12px 30px;
+  background-color: #4a148c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.lookup-form button:hover:not(:disabled) {
+  background-color: #6a1b9a;
+}
+
+.lookup-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.consignment-details {
+  border-top: 2px solid #e0e0e0;
+  padding-top: 25px;
+}
+
+.consignment-details h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  border-left: 3px solid #4a148c;
+}
+
+.detail-label {
+  display: block;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  display: block;
+  font-size: 16px;
+  color: #333;
+}
+
+.detail-value.status-in_transit {
+  color: #1565c0;
+  font-weight: bold;
+}
+
+.detail-value.status-delivered {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .lookup-container {
+    padding: 20px;
+  }
+
+  .lookup-form {
+    flex-direction: column;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

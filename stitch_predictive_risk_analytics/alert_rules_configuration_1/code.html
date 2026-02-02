@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FedEx Ops - Alert Rules Configuration</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4D148C",
+                        "fedex-purple": "#4D148C",
+                        "fedex-orange": "#FF6600",
+                        "surface-light": "#f8f9fa",
+                        "border-light": "#e5e7eb",
+                        "text-main": "#1a1a1a",
+                        "text-muted": "#6b7280",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+    </style>
+</head>
+<body class="bg-surface-light text-text-main font-display overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="hidden w-64 flex-col bg-[#4D148C] md:flex">
+<div class="flex h-16 items-center px-6">
+<div class="flex flex-col">
+<h1 class="text-white text-lg font-bold leading-normal tracking-tight">FedEx Ops</h1>
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">Planning &amp; Engineering</p>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-between p-4">
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">package_2</span>
+<span class="text-sm font-medium">Shipments</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">map</span>
+<span class="text-sm font-medium">Logistics</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg bg-white/10 px-3 py-2 text-white" href="#">
+<span class="material-symbols-outlined text-[24px] fill-1">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="pl-11 pt-1 pb-2 flex flex-col gap-2">
+<a class="text-white text-sm font-medium" href="#">Alert Rules</a>
+<a class="text-white/60 hover:text-white text-sm font-medium" href="#">Users &amp; Permissions</a>
+<a class="text-white/60 hover:text-white text-sm font-medium" href="#">Integrations</a>
+</div>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-white/70 hover:bg-white/10 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">support_agent</span>
+<span class="text-sm font-medium">Support</span>
+</a>
+</nav>
+<div class="rounded-xl bg-white/5 p-4 border border-white/10">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center rounded-full bg-green-400/20 p-2 text-green-400">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+</div>
+<div>
+<p class="text-xs text-white/60">System Status</p>
+<p class="text-sm font-bold text-green-400">All Systems Operational</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex flex-1 flex-col overflow-hidden">
+<header class="flex h-16 items-center justify-between border-b border-border-light bg-white px-6">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-text-main">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-2 text-fedex-purple">
+<span class="material-symbols-outlined text-fedex-orange">notifications_active</span>
+<h2 class="text-lg font-bold leading-tight text-text-main">Alert Rules Configuration</h2>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-text-muted">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="h-9 w-64 rounded-lg border border-border-light bg-surface-light pl-10 text-sm text-text-main focus:ring-1 focus:ring-fedex-purple focus:border-fedex-purple placeholder-text-muted" placeholder="Search rules..." type="text"/>
+</div>
+<button class="text-text-muted hover:text-text-main relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-fedex-orange"></span>
+</button>
+<div class="h-9 w-9 overflow-hidden rounded-full border border-border-light">
+<img alt="Profile picture" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfaR27y8tdQ_D910uGJSD4B-j39KcLe32QX8L09t89C79vzLdYmeN4wk2wvfCS6g3P74XD1lZ4Q34xhx1lNfBZxAE85u_2s0alKKTQqM2ta4BZdV-_xJC3sv6SO5uq3D8B_5Xq3-m7Kml4V8ZQDMYA_r421iYr3WgA3r3TfSfuQVStb7sl1derz5SY52y7CjNxgDtfN3IHWrlbPyp9qyrOTAL3BJQwqVwGFrOImt4HOYyfrrd7SqlbN9NLMf-t6R4GNEuIO1FW4CVK"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 flex-col overflow-y-auto bg-surface-light p-6">
+<div class="mx-auto w-full max-w-[1400px] flex flex-col gap-6">
+<div class="flex flex-col gap-4">
+<div class="flex flex-wrap items-center gap-2 text-sm text-text-muted">
+<a class="hover:text-fedex-purple" href="#">Operations Dashboard</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-fedex-purple" href="#">Settings</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-medium text-text-main">Alert Rules</span>
+</div>
+<div class="flex flex-wrap items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl font-bold text-text-main tracking-tight">Smart Alert Rules</h1>
+<p class="mt-1 text-text-muted">Manage proactive monitoring logic and notifications for the logistics network.</p>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col rounded-lg bg-white border border-border-light px-4 py-2 min-w-[120px] shadow-sm">
+<span class="text-xs text-text-muted">Active Rules</span>
+<span class="text-xl font-bold text-text-main">14</span>
+</div>
+<div class="flex flex-col rounded-lg bg-white border border-border-light px-4 py-2 min-w-[120px] shadow-sm">
+<span class="text-xs text-text-muted">Systems Monitored</span>
+<span class="text-xl font-bold text-text-main">8</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+<div class="lg:col-span-8 flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white border border-border-light p-3 shadow-sm">
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 rounded-md bg-fedex-purple/10 px-3 py-1.5 text-sm font-medium text-fedex-purple hover:bg-fedex-purple/20">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                    All Rules
+                                </button>
+<div class="h-4 w-px bg-border-light"></div>
+<button class="rounded-md px-3 py-1.5 text-sm font-medium text-text-muted hover:bg-surface-light hover:text-text-main transition-colors">Critical</button>
+<button class="rounded-md px-3 py-1.5 text-sm font-medium text-text-muted hover:bg-surface-light hover:text-text-main transition-colors">High Risk</button>
+<button class="rounded-md px-3 py-1.5 text-sm font-medium text-text-muted hover:bg-surface-light hover:text-text-main transition-colors">Scan Exceptions</button>
+</div>
+<div class="flex items-center gap-2 text-xs text-text-muted">
+<span>Sorted by:</span>
+<select class="bg-transparent border-none p-0 text-text-main font-semibold focus:ring-0 text-xs cursor-pointer">
+<option>Risk Level (High-Low)</option>
+<option>Newest First</option>
+<option>Alphabetical</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="group relative flex items-start gap-4 rounded-xl border border-border-light bg-white p-5 transition-all hover:border-fedex-purple/30 hover:shadow-md">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 border border-red-100">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex flex-1 flex-col gap-1">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-semibold text-text-main group-hover:text-fedex-purple transition-colors">Route Deviation Alert</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center rounded bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 border border-red-100">Critical Risk</span>
+<span class="text-xs text-text-muted">Updated 2h ago</span>
+</div>
+</div>
+<label class="relative inline-flex cursor-pointer items-center">
+<input checked="" class="peer sr-only" type="checkbox" value=""/>
+<div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-fedex-purple peer-checked:after:translate-x-full"></div>
+</label>
+</div>
+<p class="text-sm text-text-muted mt-2 font-mono bg-surface-light p-2 rounded border border-border-light">
+                                        IF <span class="text-text-main font-semibold">GPS_COORDS</span> EXCEED <span class="text-fedex-orange font-semibold">GEOFENCE_LIMIT</span> BY <span class="text-text-main font-semibold">5 MILES</span>
+</p>
+</div>
+<button class="text-text-muted hover:text-fedex-purple opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 bottom-4">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<div class="group relative flex items-start gap-4 rounded-xl border border-border-light bg-white p-5 transition-all hover:border-fedex-purple/30 hover:shadow-md">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-fedex-orange border border-orange-100">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div class="flex flex-1 flex-col gap-1">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-semibold text-text-main group-hover:text-fedex-purple transition-colors">Late PUX Scan</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center rounded bg-orange-50 px-2 py-0.5 text-xs font-semibold text-fedex-orange border border-orange-100">High Risk</span>
+<span class="text-xs text-text-muted">Updated yesterday</span>
+</div>
+</div>
+<label class="relative inline-flex cursor-pointer items-center">
+<input checked="" class="peer sr-only" type="checkbox" value=""/>
+<div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-fedex-purple peer-checked:after:translate-x-full"></div>
+</label>
+</div>
+<p class="text-sm text-text-muted mt-2 font-mono bg-surface-light p-2 rounded border border-border-light">
+                                        IF <span class="text-text-main font-semibold">SCAN_TYPE</span> MISSING AT <span class="text-fedex-orange font-semibold">18:00 LOCAL</span> FOR <span class="text-text-main font-semibold">PRIORITY_OVERNIGHT</span>
+</p>
+</div>
+<button class="text-text-muted hover:text-fedex-purple opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 bottom-4">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<div class="group relative flex items-start gap-4 rounded-xl border border-border-light bg-white p-5 transition-all hover:border-fedex-purple/30 hover:shadow-md">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-50 text-yellow-600 border border-yellow-100">
+<span class="material-symbols-outlined">hourglass_empty</span>
+</div>
+<div class="flex flex-1 flex-col gap-1">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-semibold text-text-main group-hover:text-fedex-purple transition-colors">Station Dwell Time &gt; 2hrs</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-flex items-center rounded bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-600 border border-yellow-100">Medium Risk</span>
+<span class="text-xs text-text-muted">Updated 3 days ago</span>
+</div>
+</div>
+<label class="relative inline-flex cursor-pointer items-center">
+<input class="peer sr-only" type="checkbox" value=""/>
+<div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-all peer-checked:bg-fedex-purple peer-checked:after:translate-x-full"></div>
+</label>
+</div>
+<p class="text-sm text-text-muted mt-2 font-mono bg-surface-light p-2 rounded border border-border-light">
+                                        IF <span class="text-text-main font-semibold">PACKAGE_STATUS</span> IS <span class="text-fedex-orange font-semibold">IDLE</span> &gt; <span class="text-text-main font-semibold">120 MINS</span> AT <span class="text-text-main font-semibold">SORT_FACILITY</span>
+</p>
+</div>
+<button class="text-text-muted hover:text-fedex-purple opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 bottom-4">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4">
+<div class="sticky top-0 flex flex-col gap-4 rounded-xl border border-border-light bg-white p-6 shadow-lg">
+<div class="flex items-center gap-2 border-b border-border-light pb-4">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-fedex-purple text-white shadow-md">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+<h2 class="text-lg font-bold text-text-main">Create New Rule</h2>
+</div>
+<form class="flex flex-col gap-5 mt-2">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-text-muted uppercase tracking-wider">Rule Name</label>
+<input class="rounded-lg border border-border-light bg-surface-light p-2.5 text-sm text-text-main placeholder-gray-400 focus:border-fedex-purple focus:ring-1 focus:ring-fedex-purple transition-all outline-none" placeholder="e.g. Hub Conveyor Jam" type="text"/>
+</div>
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold text-text-muted uppercase tracking-wider">Trigger Logic</label>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-semibold text-text-muted uppercase">Scan Type</span>
+<select class="w-full rounded-lg border border-border-light bg-surface-light p-2 text-sm text-text-main focus:border-fedex-purple focus:ring-fedex-purple">
+<option>STAT Scan</option>
+<option>DEX Scan</option>
+<option>PUX Scan</option>
+<option>GPS Ping</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-semibold text-text-muted uppercase">Operator</span>
+<select class="w-full rounded-lg border border-border-light bg-surface-light p-2 text-sm text-text-main focus:border-fedex-purple focus:ring-fedex-purple">
+<option>Greater Than</option>
+<option>Less Than</option>
+<option>Equal To</option>
+<option>Missing</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<input class="flex-1 rounded-lg border border-border-light bg-surface-light p-2 text-sm text-text-main focus:border-fedex-purple focus:ring-fedex-purple" placeholder="Value" type="number"/>
+<select class="w-24 rounded-lg border border-border-light bg-surface-light p-2 text-sm text-text-main focus:border-fedex-purple focus:ring-fedex-purple">
+<option>Mins</option>
+<option>Hours</option>
+<option>Miles</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-text-muted uppercase tracking-wider">Risk Level</label>
+<div class="grid grid-cols-3 gap-2">
+<label class="cursor-pointer">
+<input class="peer sr-only" name="risk" type="radio"/>
+<div class="rounded-md border border-border-light bg-surface-light py-2 text-center text-xs font-semibold text-text-muted peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600 transition-all hover:bg-gray-100">
+                                                Critical
+                                            </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="risk" type="radio"/>
+<div class="rounded-md border border-border-light bg-surface-light py-2 text-center text-xs font-semibold text-text-muted peer-checked:border-fedex-orange peer-checked:bg-orange-50 peer-checked:text-fedex-orange transition-all hover:bg-gray-100">
+                                                High
+                                            </div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="risk" type="radio"/>
+<div class="rounded-md border border-border-light bg-surface-light py-2 text-center text-xs font-semibold text-text-muted peer-checked:border-yellow-500 peer-checked:bg-yellow-50 peer-checked:text-yellow-600 transition-all hover:bg-gray-100">
+                                                Medium
+                                            </div>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-text-muted uppercase tracking-wider">Notify Recipients</label>
+<div class="rounded-lg border border-border-light bg-surface-light p-2 min-h-[42px] flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 rounded bg-fedex-purple text-white px-2 py-0.5 text-xs font-medium">
+                                            Ops Team
+                                            <span class="material-symbols-outlined text-[12px] cursor-pointer hover:text-white/80">close</span>
+</span>
+<input class="flex-1 bg-transparent border-none p-0 text-sm text-text-main placeholder-gray-400 focus:ring-0 min-w-[60px]" placeholder="Add team..." type="text"/>
+</div>
+</div>
+<div class="flex gap-3 pt-4 border-t border-border-light">
+<button class="flex-1 rounded-lg border border-border-light bg-white py-2 text-sm font-bold text-text-main hover:bg-surface-light transition-colors" type="button">
+                                        Reset
+                                    </button>
+<button class="flex-1 rounded-lg bg-fedex-purple py-2 text-sm font-bold text-white shadow-md shadow-fedex-purple/20 hover:bg-[#3d1070] transition-colors" type="button">
+                                        Save Rule
+                                    </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
