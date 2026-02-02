@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const moment = require('moment');
 const seedMockData = require('./seedData');
+const AWBData = require('./models/AWBData');
 
 // Load environment variables
 dotenv.config();
@@ -62,7 +63,15 @@ const server = app.listen(PORT, () => {
   
   // Seed mock data on startup
   seedMockData();
-  console.log('Server is listening and ready for requests...');
+  
+  // Log historical data stats
+  const stats = AWBData.getHistoricalStats();
+  console.log(`📊 Historical Data Loaded:`);
+  console.log(`   Total AWBs: ${stats.total.toLocaleString()}`);
+  console.log(`   On-Time: ${(stats.byStatus['OnTime'] || 0).toLocaleString()}`);
+  console.log(`   Delayed: ${((stats.byStatus['WDL'] || 0) + (stats.byStatus['EWDL'] || 0)).toLocaleString()}`);
+  
+  console.log('\n✅ Server is ready for requests...');
 });
 
 // Keep process alive

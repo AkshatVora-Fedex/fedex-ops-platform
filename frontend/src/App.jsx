@@ -17,6 +17,8 @@ import AnalyticsDashboard from './components/AnalyticsDashboard';
 function NavigationBar({ auth, onLogout }) {
   const location = useLocation();
   const [darkMode, setDarkMode] = useState(false);
+  const [monitoringOpen, setMonitoringOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -28,16 +30,22 @@ function NavigationBar({ auth, onLogout }) {
   const isAdmin = auth?.role === 'admin';
   const navItems = [
     { path: '/', label: 'Dashboard', icon: 'dashboard', roles: ['admin', 'ops'] },
-    { path: '/search', label: 'Search AWB', icon: 'search', roles: ['admin', 'ops'] },
+    { path: '/search', label: 'Search', icon: 'search', roles: ['admin', 'ops'] },
     { path: '/shipments', label: 'Shipments', icon: 'local_shipping', roles: ['admin', 'ops'] },
-    { path: '/alerts', label: 'Action Center', icon: 'notifications_active', roles: ['admin', 'ops'] },
-    { path: '/prediction', label: 'Prediction', icon: 'trending_up', roles: ['admin', 'ops'] },
-    { path: '/global-command', label: 'Global Command', icon: 'public', roles: ['admin'] },
-    { path: '/hub-pulse', label: 'Hub Pulse', icon: 'hub', roles: ['admin'] },
-    { path: '/rules', label: 'Rules', icon: 'tune', roles: ['admin'] },
-    { path: '/analytics', label: 'Analytics', icon: 'analytics', roles: ['admin'] },
-    { path: '/trends', label: 'Trends', icon: 'insights', roles: ['admin'] },
-    { path: '/scan-codes', label: 'Codes', icon: 'library_books', roles: ['admin'] }
+    { path: '/alerts', label: 'Actions', icon: 'notifications_active', roles: ['admin', 'ops'] },
+    { path: '/prediction', label: 'Prediction', icon: 'trending_up', roles: ['admin', 'ops'] }
+  ];
+
+  const monitoringItems = [
+    { path: '/global-command', label: 'Global Command', icon: 'public' },
+    { path: '/hub-pulse', label: 'Hub Pulse', icon: 'hub' },
+    { path: '/analytics', label: 'Analytics', icon: 'analytics' },
+    { path: '/trends', label: 'Trends', icon: 'insights' }
+  ];
+
+  const configItems = [
+    { path: '/rules', label: 'Alert Rules', icon: 'tune' },
+    { path: '/scan-codes', label: 'Scan Codes', icon: 'library_books' }
   ];
 
   return (
@@ -51,31 +59,96 @@ function NavigationBar({ auth, onLogout }) {
                 <span className="text-[#FF6600]">Ex</span>
               </span>
             </div>
-            <div className="hidden md:block ml-6">
-              <div className="text-white text-lg font-bold">Planning & Engineering</div>
-              <div className="text-indigo-200 text-xs font-medium uppercase tracking-wider">
-                Operations Proactivity Platform
-              </div>
-            </div>
+            <Link to="/" className="hidden md:block ml-6 hover:opacity-80 transition-opacity">
+              <div className="text-white text-lg font-bold">OpsPulse</div>
+            </Link>
           </div>
 
           <nav className="hidden md:flex items-center space-x-1">
-            {navItems
-              .filter((item) => item.roles.includes(auth?.role))
-              .map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
-                    isActive(item.path)
-                      ? 'bg-white/20 text-white'
-                      : 'text-indigo-200 hover:bg-white/10 hover:text-white'
-                  }`}
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`px-3 py-2 rounded-md text-sm font-semibold transition-all ${
+                  isActive(item.path)
+                    ? 'bg-white/20 text-white'
+                    : 'text-indigo-200 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <span className="material-icons text-sm align-middle mr-1">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+
+            {isAdmin && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setMonitoringOpen(!monitoringOpen);
+                    setConfigOpen(false);
+                  }}
+                  className="px-3 py-2 rounded-md text-sm font-semibold text-indigo-200 hover:bg-white/10 hover:text-white transition-all inline-flex items-center"
                 >
-                  <span className="material-icons text-sm align-middle mr-1">{item.icon}</span>
-                  {item.label}
-                </Link>
-              ))}
+                  <span className="material-icons text-sm align-middle mr-1">visibility</span>
+                  Monitoring
+                  <span className="material-icons text-xs ml-1">{monitoringOpen ? 'expand_less' : 'expand_more'}</span>
+                </button>
+                {monitoringOpen && (
+                  <div className="absolute top-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 min-w-[180px] z-50">
+                    {monitoringItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMonitoringOpen(false)}
+                        className={`block px-4 py-2 text-sm ${
+                          isActive(item.path)
+                            ? 'bg-indigo-50 dark:bg-indigo-900/30 text-[#4D148C] dark:text-indigo-300 font-semibold'
+                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <span className="material-icons text-sm align-middle mr-2">{item.icon}</span>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isAdmin && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setConfigOpen(!configOpen);
+                    setMonitoringOpen(false);
+                  }}
+                  className="px-3 py-2 rounded-md text-sm font-semibold text-indigo-200 hover:bg-white/10 hover:text-white transition-all inline-flex items-center"
+                >
+                  <span className="material-icons text-sm align-middle mr-1">settings</span>
+                  Config
+                  <span className="material-icons text-xs ml-1">{configOpen ? 'expand_less' : 'expand_more'}</span>
+                </button>
+                {configOpen && (
+                  <div className="absolute top-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 min-w-[180px] z-50">
+                    {configItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setConfigOpen(false)}
+                        className={`block px-4 py-2 text-sm ${
+                          isActive(item.path)
+                            ? 'bg-indigo-50 dark:bg-indigo-900/30 text-[#4D148C] dark:text-indigo-300 font-semibold'
+                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <span className="material-icons text-sm align-middle mr-2">{item.icon}</span>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           <div className="flex items-center space-x-4">

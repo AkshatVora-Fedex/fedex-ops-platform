@@ -9,11 +9,14 @@ router.get('/overview', (req, res) => {
   try {
     const consignments = AWBData.getAllConsignments();
     const alerts = AlertService.getActiveAlerts();
+    const historicalStats = AWBData.getHistoricalStats();
 
-    const totalConsignments = consignments.length;
-    const inTransit = consignments.filter(c => c.status === 'IN_TRANSIT').length;
-    const delivered = consignments.filter(c => c.status === 'DELIVERED').length;
-    const atRisk = consignments.filter(c => PredictiveService.predictDelay(c).willBeDelayed).length;
+    const totalConsignments = historicalStats.total;
+    const inTransit = historicalStats.byStatus['IN_TRANSIT'] || 0;
+    const delivered = historicalStats.byStatus['DELIVERED'] || historicalStats.byStatus['OnTime'] || 0;
+    const delayed = historicalStats.byStatus['DELAYED'] || historicalStats.byStatus['WDL'] || 0;
+    const exceptions = historicalStats.byStatus['EXCEPTION'] || historicalStats.byStatus['EWDL'] || 0;
+    const atRisk = delayed + exceptions;
 
     const alertStats = AlertService.getAlertStats();
 
@@ -24,9 +27,12 @@ router.get('/overview', (req, res) => {
           total: totalConsignments,
           inTransit,
           delivered,
-          atRisk
+          atRisk,
+          delayed,
+          exceptions
         },
         alerts: alertStats,
+        historicalStats,
         lastUpdated: new Date().toISOString()
       }
     });
