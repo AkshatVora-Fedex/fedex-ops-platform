@@ -1,0 +1,17 @@
+
+╔════════════════════════════════════════════════════════╗
+║  FedEx Operations Platform Backend                     ║
+║  Running on port 5000                               ║
+║  Environment: development               ║
+╚════════════════════════════════════════════════════════╝
+  
+Seeding mock consignment data...
+✓ Mock data seeded successfully
+✅ Loaded 57233 historical AWB records
+📊 Historical Data Loaded:
+   Total AWBs: 57,233
+   On-Time: 0
+   Delayed: 0
+
+✅ Server is ready for requests...
+Loaded 57233 AWB records

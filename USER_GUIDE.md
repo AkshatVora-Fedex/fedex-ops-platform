@@ -34,6 +34,52 @@
    - Shipper and receiver information
 4. Click "View Detailed Tracking" to see full telemetry
 
+**📁 Upload AWB Data Feature:**
+The ConsignmentLookup page also includes a powerful file upload feature to batch import shipment data:
+
+1. **Access Upload:**
+   - Click the "📤 Upload File" button on the ConsignmentLookup page
+   - Supported file formats: `.txt`, `.csv`, `.xlsb`
+
+2. **Prepare Your File:**
+   - Use CSV format matching the IN SPAC NSL standard structure
+   - Required columns: shp_trk_nbr, shpr_co_nm, orig_loc_cd, dest_loc_cd, Service, etc.
+   - Each row represents one shipment (AWB)
+   - File can contain hundreds or thousands of records
+
+3. **Upload Process:**
+   - Click the file input or drag-and-drop your file
+   - System validates file format
+   - Backend parses CSV and extracts all fields:
+     - Shipment tracking info (AWB, Master AWB, dates)
+     - Shipper/Recipient details
+     - Origin/Destination locations and regions
+     - Service type and product information
+     - Performance metrics and scan information
+
+4. **Success Confirmation:**
+   - Green success message appears with records added count
+   - Message shows total records now in the system
+   - Message auto-dismisses after 5 seconds
+   - All newly added records immediately become searchable
+   - Sample AWBs list updates to include new shipments
+
+5. **Data Integration:**
+   - Uploaded records merge with existing historical data
+   - Automatic deduplication by AWB prevents duplicates
+   - Data is immediately available across all app pages:
+     - Search results show new shipments
+     - Dashboard metrics update with new data
+     - Tracking pages display new routes
+     - Alerts system analyzes new shipments
+
+6. **Example Data Structure:**
+   The system expects data in this format:
+   ```
+   shp_trk_nbr, mstr_ab_trk_nbr, shp_dt, orig_loc_cd, dest_loc_cd, Service, Bucket, ...
+   883775720669, , 2025-08-23, BOMCL, PAGA, Priority, OnTime, ...
+   ```
+
 ---
 
 ### 📍 Shipment Telemetry & Tracking Details

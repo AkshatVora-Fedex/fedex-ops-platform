@@ -4,9 +4,9 @@ const AWBData = require('../models/AWBData');
 const ScanData = require('../models/ScanData');
 
 // Get tracking details for AWB
-router.get('/:awb', (req, res) => {
+router.get('/:awb', async (req, res) => {
   try {
-    const consignment = AWBData.getConsignmentByAWB(req.params.awb);
+    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });
@@ -49,9 +49,9 @@ router.get('/:awb', (req, res) => {
 });
 
 // Get scan checklist for specific AWB
-router.get('/:awb/checklist', (req, res) => {
+router.get('/:awb/checklist', async (req, res) => {
   try {
-    const consignment = AWBData.getConsignmentByAWB(req.params.awb);
+    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });
@@ -92,9 +92,9 @@ router.get('/:awb/checklist', (req, res) => {
 });
 
 // Get live location
-router.get('/:awb/location', (req, res) => {
+router.get('/:awb/location', async (req, res) => {
   try {
-    const consignment = AWBData.getConsignmentByAWB(req.params.awb);
+    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });

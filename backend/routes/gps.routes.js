@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const AWBData = require('../models/AWBData');
 
 // Mock GPS data for demonstration
 const gpsData = {
@@ -184,5 +185,25 @@ router.get('/breadcrumb/:awb', (req, res) => {
     });
   }
 });
+
+// Helper function to get coordinates from location code
+function getCoordinatesFromLocation(locationCode) {
+  const coordinates = {
+    'BOMCL': [72.8479, 19.0760],
+    'DELMK': [77.1025, 28.7041],
+    'BLRMH': [77.5946, 12.9716],
+    'CCUDH': [88.3639, 22.5726],
+    'HYDRR': [78.4711, 17.3850],
+    'PAGA': [120.9842, 14.5995],
+    'BKKIP': [100.5018, 13.7563],
+    'BAOA': [104.8654, 11.5564],
+    'CGKIP': [106.6552, -6.2088],
+    'SINWK': [103.8198, 1.3521],
+    'DADA': [105.7872, 10.0216],
+    'CDGHU': [2.5559, 49.0097],
+    'default': [-95.7129, 37.0902]
+  };
+  return coordinates[locationCode] || coordinates['default'];
+}
 
 module.exports = router;

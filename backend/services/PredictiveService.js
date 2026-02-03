@@ -10,17 +10,46 @@ class PredictiveService {
     let delayProbability = 0;
     const reasons = [];
 
+    // Debug logging
+    if (Math.random() < 0.001) {  // Log 0.1% of calls
+      console.log('[DEBUG] PredictiveService.predictDelay called');
+      console.log('  isHistorical:', consignment.isHistorical);
+      console.log('  status:', consignment.status);
+      console.log('  awb:', consignment.awb);
+    }
+
     // For historical data, use actual status
     if (consignment.isHistorical) {
       const statusMap = {
+        // Delivery statuses (from test data)
         'OnTime': 10,
+        'Delayed': 75,
+        'Early': 5,
+        'Late': 80,
+        'Very Late': 95,
+        
+        // Operational stages (from IN SPAC NSL data)
+        // Adjusted for better risk distribution
+        'Unknown': 25,  // LOW - Unknown status (most common, 60%+)
+        'EXCLUDE': 65,  // HIGH - Excluded from normal processing
+        'TRANSIT-Processing': 20,  // LOW - In processing
+        'TRANSIT-Linehaul': 22,  // LOW - In linehaul  
+        'CLEARANCE': 55,  // HIGH - Customs clearance can cause delays
+        'ORIGIN': 15,  // LOW - At origin
+        'HUB': 18,  // LOW - At hub
+        'DEST': 12,  // LOW - At destination
+        'Maintenance': 75,  // HIGH - Maintenance issues
+        'UNASSIGNED': 70,  // HIGH - Unassigned status
+        
+        // Legacy statuses
         'IN_TRANSIT': 35,
         'WDL': 65,
         'EWDL': 85,
         'DELAYED': 75,
         'EXCEPTION': 90,
         'RDL': 70,
-        'ERDL': 95
+        'ERDL': 95,
+        'Other': 50
       };
       
       delayProbability = statusMap[consignment.status] || 35;
