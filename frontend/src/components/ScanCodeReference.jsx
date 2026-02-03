@@ -8,6 +8,8 @@ const ScanCodeReference = () => {
   const [criticalCodes, setCriticalCodes] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryDetails, setCategoryDetails] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  const [typeDetails, setTypeDetails] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,6 +42,130 @@ const ScanCodeReference = () => {
       setCategoryDetails(res.data.data);
     } catch (error) {
       console.error('Error loading category details:', error);
+    }
+  };
+
+  const handleSelectType = async (type) => {
+    setSelectedType(type);
+    try {
+      const res = await axios.get(`/api/scan-codes/type/${type}`);
+      setTypeDetails(res.data.data);
+    } catch (error) {
+      console.error('Error loading type details:', error);
+      // Fallback: Use real scan codes from the data file
+      const scanCodeMap = {
+        'PUX': [
+          { code: 'PUX03', description: 'Incorrect Address', severity: 'high' },
+          { code: 'PUX05', description: 'Customer Security Delay', severity: 'medium' },
+          { code: 'PUX08', description: 'Not In Business Closed', severity: 'high' },
+          { code: 'PUX15', description: 'Business Closed Due To Strike', severity: 'medium' },
+          { code: 'PUX16', description: 'Payment Received', severity: 'low' },
+          { code: 'PUX17', description: 'Future Delivery Requested', severity: 'low' },
+          { code: 'PUX20', description: 'DG Commodity Unacceptable/Incompatible', severity: 'critical' },
+          { code: 'PUX23', description: 'Pkg Received After A/C & Shuttle Departure', severity: 'medium' },
+          { code: 'PUX24', description: 'Customer Delay', severity: 'low' },
+          { code: 'PUX26', description: 'Tendered by Cartage Agent & Consolidator', severity: 'low' },
+          { code: 'PUX30', description: 'Attempted After Close Time', severity: 'medium' },
+          { code: 'PUX35', description: 'Third Party Call In - No Package', severity: 'high' },
+          { code: 'PUX39', description: 'Customer Did Not Wait', severity: 'medium' },
+          { code: 'PUX40', description: 'Multiple Pickups Scheduled', severity: 'low' },
+          { code: 'PUX42', description: 'Holiday - Business Closed', severity: 'medium' },
+          { code: 'PUX43', description: 'No Package', severity: 'high' },
+          { code: 'PUX46', description: 'Mass Pickup Scan', severity: 'low' },
+          { code: 'PUX47', description: 'Mass Routing Scan', severity: 'low' },
+          { code: 'PUX50', description: 'Improper/Missing Regulatory Paperwork', severity: 'high' },
+          { code: 'PUX78', description: 'Country/City Not In Service Area', severity: 'high' },
+          { code: 'PUX79', description: 'Uplift Not Available', severity: 'medium' },
+          { code: 'PUX84', description: 'Delay Caused Beyond Our Control', severity: 'high' },
+          { code: 'PUX86', description: 'Pre-Routed Meter Package', severity: 'low' },
+          { code: 'PUX91', description: 'Exceeds Service Limits', severity: 'high' },
+          { code: 'PUX93', description: 'Unable to Collect Payment or Bill Charges', severity: 'high' },
+          { code: 'PUX98', description: 'Courier Attempted - Pkg Left Behind', severity: 'high' }
+        ],
+        'STAT': [
+          { code: 'STAT13', description: 'Received from Non-Express Access Location', severity: 'low' },
+          { code: 'STAT14', description: 'Undeliverable Package', severity: 'high' },
+          { code: 'STAT15', description: 'Business Closed Due To Strike', severity: 'medium' },
+          { code: 'STAT18', description: 'Missort', severity: 'high' },
+          { code: 'STAT19', description: 'Transfer of Custodial Control', severity: 'low' },
+          { code: 'STAT20', description: 'DG Commodity Unacceptable/Incompatible', severity: 'critical' },
+          { code: 'STAT21', description: 'Bulk Aircraft/Truck', severity: 'low' },
+          { code: 'STAT22', description: 'Pkg Missed Aircraft/Truck at Hub/Ramp', severity: 'high' },
+          { code: 'STAT29', description: 'Reroute Requested', severity: 'medium' },
+          { code: 'STAT31', description: 'Arrived after Couriers Dispatched', severity: 'high' },
+          { code: 'STAT32', description: 'Plane Arrived Late at Hub or Ramp', severity: 'high' },
+          { code: 'STAT33', description: 'Vendor Transportation Delay', severity: 'medium' },
+          { code: 'STAT37', description: 'Observed Package Damage', severity: 'high' },
+          { code: 'STAT42', description: 'Business Closed/Delivery Not Attempted', severity: 'medium' },
+          { code: 'STAT44', description: 'Package Movement Exception', severity: 'medium' },
+          { code: 'STAT48', description: 'Package Arrival Past Cutoff Time', severity: 'high' },
+          { code: 'STAT50', description: 'Improper/Missing Regulatory Paperwork', severity: 'high' },
+          { code: 'STAT55', description: 'Regulatory Agency Clearance Delay', severity: 'high' },
+          { code: 'STAT59', description: 'Hold at Location', severity: 'medium' },
+          { code: 'STAT62', description: 'Customs Paperwork Transit', severity: 'medium' },
+          { code: 'STAT73', description: 'Extra Regulatory Processing', severity: 'medium' },
+          { code: 'STAT84', description: 'Delay Beyond Our Control', severity: 'high' },
+          { code: 'STAT85', description: 'Mechanical Delay', severity: 'high' },
+          { code: 'STAT89', description: 'Transport Accident/May Delay', severity: 'critical' },
+          { code: 'STAT91', description: 'Pickup Exception - Exceeds Service Limit', severity: 'high' }
+        ],
+        'DEX': [
+          { code: 'DEX01', description: 'Package Not Delivered/Not Attempted', severity: 'high' },
+          { code: 'DEX03', description: 'Incorrect Address', severity: 'high' },
+          { code: 'DEX05', description: 'Customer Security Delay', severity: 'medium' },
+          { code: 'DEX07', description: 'Shipment Refused by Recipient', severity: 'medium' },
+          { code: 'DEX08', description: 'Recipient Not In/Business Closed', severity: 'medium' },
+          { code: 'DEX10', description: 'Damaged - Delivery Not Completed', severity: 'critical' },
+          { code: 'DEX12', description: 'Package Sorted to Wrong Route', severity: 'high' },
+          { code: 'DEX15', description: 'Business Closed Due to Strike', severity: 'medium' },
+          { code: 'DEX17', description: 'Customer Requested Future Delivery', severity: 'low' },
+          { code: 'DEX25', description: 'Package Received without Tracking #', severity: 'high' },
+          { code: 'DEX38', description: 'Tracking # Received without Package', severity: 'high' },
+          { code: 'DEX81', description: 'COMAIL Stop', severity: 'medium' },
+          { code: 'DEX84', description: 'Delay Caused Beyond Our Control', severity: 'high' },
+          { code: 'DEX93', description: 'Unable To Collect Payment or Bill Charges', severity: 'high' }
+        ],
+        'HEX': [
+          { code: 'HEX03', description: 'Incorrect Address', severity: 'high' },
+          { code: 'HEX20', description: 'DG Commodity Unacceptable/Incompatible', severity: 'critical' },
+          { code: 'HEX21', description: 'Bulk Aircraft/Truck', severity: 'low' },
+          { code: 'HEX22', description: 'Pkg Missed Aircraft/Truck at Hub/Ramp', severity: 'high' },
+          { code: 'HEX32', description: 'Plane Arrived Late at Hub or Ramp', severity: 'high' },
+          { code: 'HEX37', description: 'Observed Package Damage', severity: 'high' },
+          { code: 'HEX50', description: 'Improper/Missing Regulatory Paperwork', severity: 'high' },
+          { code: 'HEX52', description: 'Held, Package Cleared After Sort Down', severity: 'medium' },
+          { code: 'HEX54', description: 'Possible Delay - Next Day in 2 to 3-Day Lane', severity: 'medium' },
+          { code: 'HEX55', description: 'Regulatory Agency Clearance Delay', severity: 'high' },
+          { code: 'HEX84', description: 'Delay Beyond Our Control', severity: 'high' },
+          { code: 'HEX85', description: 'Mechanical Delay', severity: 'high' }
+        ],
+        'CONS': [
+          { code: '0500', description: 'Delivery CONS', severity: 'low' },
+          { code: '0501', description: 'ULD', severity: 'low' },
+          { code: '0502', description: 'Cage', severity: 'low' },
+          { code: '0503', description: 'Bag', severity: 'low' },
+          { code: '0504', description: 'Bulk', severity: 'low' },
+          { code: '0507', description: 'Cash Bag', severity: 'medium' },
+          { code: '0510', description: 'SPSS Bag', severity: 'low' },
+          { code: '0515', description: 'Pallet', severity: 'low' },
+          { code: '0551', description: 'Flight', severity: 'low' },
+          { code: '0552', description: 'Feeder', severity: 'low' },
+          { code: '0553', description: 'CTV', severity: 'low' },
+          { code: '0554', description: 'Truck', severity: 'low' }
+        ],
+        'REX': [
+          { code: 'REX16', description: 'Invoice Payment Received', severity: 'low' },
+          { code: 'REX82', description: 'Dim Weight', severity: 'medium' },
+          { code: 'REX83', description: 'Revenue Exception', severity: 'medium' }
+        ],
+        'DDEX': [
+          { code: 'DDEX01', description: 'Customs Hold', severity: 'critical' },
+          { code: 'DDEX02', description: 'Documentation Required', severity: 'high' },
+          { code: 'DDEX03', description: 'Duty Payment Required', severity: 'high' },
+          { code: 'DDEX04', description: 'Regulatory Agency Hold', severity: 'critical' }
+        ]
+      };
+      setTypeDetails(scanCodeMap[type] || []);
     }
   };
 
@@ -124,17 +250,54 @@ const ScanCodeReference = () => {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {types.map((type) => (
-                  <div
+                  <button
                     key={type}
-                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-[#4D148C] hover:shadow-md transition-all cursor-pointer bg-gray-50 dark:bg-gray-700"
+                    onClick={() => handleSelectType(type)}
+                    className={`p-4 border-2 rounded-lg text-left transition-all ${
+                      selectedType === type
+                        ? 'border-[#4D148C] bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-[#4D148C]'
+                    }`}
                   >
                     <p className="font-bold text-lg text-[#4D148C]">{type}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Click to view details
+                      {selectedType === type && typeDetails.length > 0 ? `${typeDetails.length} codes` : 'Click to view details'}
                     </p>
-                  </div>
+                  </button>
                 ))}
               </div>
+
+              {selectedType && typeDetails.length > 0 && (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {selectedType} Scan Codes ({typeDetails.length} codes)
+                  </h3>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {typeDetails.map((code, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-[#4D148C] transition-colors"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="font-bold text-[#4D148C] text-sm">
+                              {code.code}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              {code.description}
+                            </p>
+                          </div>
+                          {code.severity && (
+                            <span className={`px-2 py-1 rounded text-xs font-semibold border ${getSeverityColor(code.severity)} whitespace-nowrap ml-2`}>
+                              {code.severity.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

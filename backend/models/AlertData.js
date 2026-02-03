@@ -74,6 +74,10 @@ class AlertData {
     return this.alerts.filter(a => a.severity === severity && a.status === 'ACTIVE');
   }
 
+  getAllAlerts() {
+    return this.alerts;
+  }
+
   updateAlertStatus(alertId, status, note = null) {
     const alert = this.alerts.find(a => a.id === alertId);
     if (alert) {

@@ -17,6 +17,44 @@ router.get('/active', (req, res) => {
   }
 });
 
+// Get all alerts
+router.get('/all', (req, res) => {
+  try {
+    const alerts = AlertService.getAllAlerts();
+    // Sort by severity and creation date
+    const sorted = alerts.sort((a, b) => {
+      const severityOrder = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+      if (a.severity !== b.severity) {
+        return (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4);
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    res.json({
+      success: true,
+      count: sorted.length,
+      data: sorted
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Search alerts by AWB
+router.get('/search/:awb', (req, res) => {
+  try {
+    const alerts = AlertService.searchByAWB(req.params.awb);
+
+    res.json({
+      success: true,
+      count: alerts.length,
+      data: alerts
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get alerts for specific AWB
 router.get('/:awb', (req, res) => {
   try {
@@ -94,6 +132,26 @@ router.patch('/:alertId/resolve', (req, res) => {
     res.json({
       success: true,
       message: 'Alert resolved',
+      data: alert
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Override alert
+router.patch('/:alertId/override', (req, res) => {
+  try {
+    const { note } = req.body;
+    const alert = AlertService.overrideAlert(req.params.alertId, note);
+
+    if (!alert) {
+      return res.status(404).json({ error: 'Alert not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Alert overridden',
       data: alert
     });
   } catch (error) {

@@ -18,6 +18,10 @@ const Dashboard = () => {
         dashboardService.getOverview(),
         dashboardService.getMetrics()
       ]);
+      console.log('Raw overview response:', overviewRes);
+      console.log('Raw metrics response:', metricsRes);
+      console.log('Overview data to set:', overviewRes.data.data);
+      console.log('Metrics data to set:', metricsRes.data.data);
       setOverview(overviewRes.data.data);
       setMetrics(metricsRes.data.data);
     } catch (error) {
@@ -33,6 +37,33 @@ const Dashboard = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4D148C]"></div>
       </div>
     );
+  }
+
+  // Ensure we always have overview and metrics objects
+  if (!overview || !metrics) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-red-600 font-bold">
+          Error: Unable to load dashboard data. Please refresh the page.
+        </div>
+      </div>
+    );
+  }
+
+  const totalConsignments = overview?.consignments?.total || 0;
+  const deliveredFallback =
+    (overview?.historicalStats?.byStatus?.DELIVERED || 0) +
+    (overview?.historicalStats?.byStatus?.OnTime || 0);
+  const deliveredCount = overview?.consignments?.delivered || deliveredFallback;
+  const inTransitCount = overview?.consignments?.inTransit || Math.max(0, totalConsignments - deliveredCount);
+  const atRiskFallback = metrics
+    ? (metrics.riskDistribution?.critical || 0) + (metrics.riskDistribution?.high || 0)
+    : 0;
+  const atRiskCount = overview?.consignments?.atRisk || atRiskFallback;
+
+  // Debug logging
+  if (totalConsignments > 0) {
+    console.log('Display values - Total:', totalConsignments, 'InTransit:', inTransitCount, 'Delivered:', deliveredCount, 'AtRisk:', atRiskCount);
   }
 
   return (
@@ -73,7 +104,7 @@ const Dashboard = () => {
                   </dt>
                   <dd className="flex items-baseline">
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
-                      {overview?.consignments?.total || 0}
+                      {totalConsignments}
                     </div>
                   </dd>
                 </dl>
@@ -97,7 +128,7 @@ const Dashboard = () => {
                   </dt>
                   <dd className="flex items-baseline">
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
-                      {overview?.consignments?.inTransit || 0}
+                      {inTransitCount}
                     </div>
                     <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
                       <span className="material-icons text-xs">trending_up</span>
@@ -124,7 +155,7 @@ const Dashboard = () => {
                   </dt>
                   <dd className="flex items-baseline">
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
-                      {overview?.consignments?.delivered || 0}
+                      {deliveredCount}
                     </div>
                   </dd>
                 </dl>
@@ -148,7 +179,7 @@ const Dashboard = () => {
                   </dt>
                   <dd className="flex items-baseline">
                     <div className="text-2xl font-semibold text-red-600 dark:text-red-400">
-                      {overview?.consignments?.atRisk || 0}
+                      {atRiskCount}
                     </div>
                     <div className="ml-2 flex items-baseline text-sm font-semibold text-red-600">
                       <span className="material-icons text-xs animate-pulse">error</span>

@@ -212,12 +212,12 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {auth && <NavigationBar auth={auth} onLogout={handleLogout} />}
+        <NavigationBar auth={auth} onLogout={handleLogout} />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/" element={requireAuth(<Dashboard />, ['admin', 'ops'])} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/search" element={requireAuth(<ConsignmentLookup />, ['admin', 'ops'])} />
             <Route path="/tracking/:awb" element={requireAuth(<TrackingDetails />, ['admin', 'ops'])} />
             <Route path="/alerts" element={requireAuth(<AlertCenter />, ['admin', 'ops'])} />

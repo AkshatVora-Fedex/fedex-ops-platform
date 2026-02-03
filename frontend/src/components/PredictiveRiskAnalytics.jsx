@@ -9,26 +9,19 @@ const PredictiveRiskAnalytics = () => {
   const [filterService, setFilterService] = useState('all');
   const [filterRisk, setFilterRisk] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
-  // Territory and region mappings
+  // Territory and region mappings - updated from IN SPAC NSL data
   const territories = {
     'all': { name: 'All Territories', regions: [] },
-    'NA': { name: 'North America', regions: ['MEM', 'IND', 'ORD', 'LAX', 'ATL', 'DFW', 'PHX', 'DEN'] },
-    'EMEA': { name: 'Europe/Middle East/Africa', regions: ['CDG', 'LHR', 'DXB', 'FRA', 'AMS', 'MAD'] },
-    'APAC': { name: 'Asia Pacific', regions: ['HKG', 'SIN', 'NRT', 'SYD', 'PVG', 'ICN', 'BKK'] },
-    'LAC': { name: 'Latin America/Caribbean', regions: ['GRU', 'MEX', 'BOG', 'EZE', 'LIM', 'SCL'] }
+    'MEISA': { name: 'MEISA (Middle East & South Asia)', regions: ['BOMCL', 'AMDVG', 'GUXAT', 'RAJAD', 'MAAA', 'DAEA', 'DELCP', 'BOMTP', 'GUXKO', 'AMDBH', 'BLRPE', 'BLRKR', 'MAAPE'] },
+    'APAC': { name: 'Asia Pacific', regions: ['SGNA', 'JKTA', 'DADA', 'BDQA', 'BKKA', 'BAOA', 'CGKA', 'HLPA', 'SUBA', 'KWBA', 'QHIA', 'TDXA', 'CUJA', 'DPSA', 'PAGA', 'KDTA'] }
   };
 
   const serviceTypes = {
     'all': 'All Service Types',
-    'PRIORITY_OVERNIGHT': 'Priority Overnight',
-    'STANDARD_OVERNIGHT': 'Standard Overnight',
-    'FEDEX_2DAY': 'FedEx 2Day',
-    'FEDEX_GROUND': 'FedEx Ground',
-    'EXPRESS_SAVER': 'FedEx Express Saver',
-    'INTERNATIONAL_PRIORITY': 'International Priority',
-    'INTERNATIONAL_ECONOMY': 'International Economy',
-    'INTERNATIONAL_FIRST': 'International First'
+    'Priority': 'Priority',
+    'Deferred': 'Deferred'
   };
 
   useEffect(() => {
@@ -40,16 +33,79 @@ const PredictiveRiskAnalytics = () => {
   const loadPredictions = async () => {
     try {
       const response = await predictiveService.getAllPredictions();
-      const predictions = (response.data.data || []).map(pred => ({
-        ...pred,
-        id: pred.awb,
-      }));
+      const payload = response.data.data || {};
+      const predictions = (payload.predictions || payload || []).map((pred) => {
+        const delayProbability = Number(pred.delayProbability ?? pred.prediction?.delayProbability ?? 0);
+        const riskLevel = pred.riskLevel || pred.prediction?.riskLevel || 'LOW';
+        return {
+          ...pred,
+          id: pred.awb,
+          delayProbability,
+          riskLevel,
+          estimatedDelay: pred.deliveryEstimate?.estimatedDelay ?? pred.estimatedDelay ?? 0,
+          factors: pred.prediction?.reasons || pred.factors || [],
+          recommendations: pred.recommendations || [],
+          promiseDate: pred.promiseDate || pred.deliveryEstimate?.revisedEstimate || pred.deliveryEstimate?.originalEstimate
+        };
+      });
       setShipments(predictions);
     } catch (error) {
       console.error('Error loading predictions:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectShipment = async (shipment) => {
+    setSelectedShipment(shipment);
+    if (!shipment?.awb) return;
+    try {
+      setDetailsLoading(true);
+      const response = await awbService.getByAWB(shipment.awb);
+      const details = response.data.data;
+      if (!details) return;
+      setSelectedShipment((prev) => ({
+        ...prev,
+        weight: details.weight,
+        shipper: details.shipper,
+        receiver: details.receiver,
+        serviceType: details.serviceType || prev?.serviceType,
+        origin: details.origin || prev?.origin,
+        destination: details.destination || prev?.destination,
+        promiseDate: details.estimatedDelivery || prev?.promiseDate,
+      }));
+    } catch (error) {
+      console.error('Error loading shipment details:', error);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const getLocationText = (value) => (value || '').toString().toUpperCase();
+
+  const formatProbability = (value) => {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+  };
+
+  const formatDate = (value) => {
+    if (!value) return 'N/A';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return parsed.toLocaleDateString();
+  };
+
+  const normalizeServiceType = (value) => {
+    if (!value) return null;
+    const text = value.toString().toUpperCase();
+    if (text.includes('PRIORITY')) return 'INTERNATIONAL_PRIORITY';
+    if (text.includes('STANDARD')) return 'STANDARD_OVERNIGHT';
+    if (text.includes('2DAY')) return 'FEDEX_2DAY';
+    if (text.includes('GROUND')) return 'FEDEX_GROUND';
+    if (text.includes('SAVER')) return 'EXPRESS_SAVER';
+    if (text.includes('INTERNATIONAL FIRST')) return 'INTERNATIONAL_FIRST';
+    if (text.includes('INTERNATIONAL ECONOMY')) return 'INTERNATIONAL_ECONOMY';
+    return value;
   };
 
   const getRiskColor = (riskLevel) => {
@@ -74,16 +130,18 @@ const PredictiveRiskAnalytics = () => {
 
   const filteredShipments = shipments.filter((shipment) => {
     // Territory filter
-    const matchTerritory = filterTerritory === 'all' || 
-      (territories[filterTerritory] && territories[filterTerritory].regions.some(region => 
-        shipment.origin && shipment.origin.startsWith(region)
+    const originText = getLocationText(shipment.origin);
+    const matchTerritory = filterTerritory === 'all' ||
+      (territories[filterTerritory] && territories[filterTerritory].regions.some(region =>
+        originText.includes(region)
       ));
     
     // Region filter (cascades from territory)
-    const matchRegion = filterRegion === 'all' || (shipment.origin && shipment.origin.startsWith(filterRegion));
+    const matchRegion = filterRegion === 'all' || originText.includes(filterRegion);
     
     // Service type filter
-    const matchService = filterService === 'all' || shipment.serviceType === filterService;
+    const normalizedService = normalizeServiceType(shipment.serviceType);
+    const matchService = filterService === 'all' || normalizedService === filterService || shipment.serviceType === filterService;
     
     // Risk level filter
     const matchRisk = filterRisk === 'all' || shipment.riskLevel === filterRisk;
@@ -102,6 +160,8 @@ const PredictiveRiskAnalytics = () => {
 
   const riskStats = getRiskStats();
   const totalAtRisk = riskStats.critical + riskStats.high + riskStats.medium;
+  const totalShipments = shipments.length;
+  const percentOfTotal = (value) => (totalShipments ? ((value / totalShipments) * 100).toFixed(1) : '0.0');
 
   if (loading) {
     return (
@@ -139,35 +199,35 @@ const PredictiveRiskAnalytics = () => {
           <p className="text-sm opacity-90 font-semibold">CRITICAL RISK</p>
           <p className="text-3xl font-bold mt-2">{riskStats.critical}</p>
           <p className="text-xs opacity-75 mt-1">
-            {((riskStats.critical / shipments.length) * 100).toFixed(1)}%
+            {percentOfTotal(riskStats.critical)}%
           </p>
         </div>
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg p-4 shadow-lg">
           <p className="text-sm opacity-90 font-semibold">HIGH RISK</p>
           <p className="text-3xl font-bold mt-2">{riskStats.high}</p>
           <p className="text-xs opacity-75 mt-1">
-            {((riskStats.high / shipments.length) * 100).toFixed(1)}%
+            {percentOfTotal(riskStats.high)}%
           </p>
         </div>
         <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white rounded-lg p-4 shadow-lg">
           <p className="text-sm opacity-90 font-semibold">MEDIUM RISK</p>
           <p className="text-3xl font-bold mt-2">{riskStats.medium}</p>
           <p className="text-xs opacity-75 mt-1">
-            {((riskStats.medium / shipments.length) * 100).toFixed(1)}%
+            {percentOfTotal(riskStats.medium)}%
           </p>
         </div>
         <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 shadow-lg">
           <p className="text-sm opacity-90 font-semibold">LOW RISK</p>
           <p className="text-3xl font-bold mt-2">{riskStats.low}</p>
           <p className="text-xs opacity-75 mt-1">
-            {((riskStats.low / shipments.length) * 100).toFixed(1)}%
+            {percentOfTotal(riskStats.low)}%
           </p>
         </div>
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 shadow-lg">
           <p className="text-sm opacity-90 font-semibold">AT RISK</p>
           <p className="text-3xl font-bold mt-2">{totalAtRisk}</p>
           <p className="text-xs opacity-75 mt-1">
-            {((totalAtRisk / shipments.length) * 100).toFixed(1)}%
+            {percentOfTotal(totalAtRisk)}%
           </p>
         </div>
       </div>
@@ -210,37 +270,45 @@ const PredictiveRiskAnalytics = () => {
                   value={filterRegion}
                   onChange={(e) => setFilterRegion(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#4D148C]"
-                  disabled={filterTerritory !== 'all'}
+                  disabled={filterTerritory === 'all'}
                 >
-                  <option value="all">All Regions</option>
-                  {filterTerritory === 'all' && (
-                    <>
-                      <optgroup label="North America">
-                        <option value="MEM">Memphis (MEM)</option>
-                        <option value="IND">Indianapolis (IND)</option>
-                        <option value="ORD">Chicago (ORD)</option>
-                        <option value="LAX">Los Angeles (LAX)</option>
-                        <option value="ATL">Atlanta (ATL)</option>
-                        <option value="DFW">Dallas (DFW)</option>
-                      </optgroup>
-                      <optgroup label="EMEA">
-                        <option value="CDG">Paris (CDG)</option>
-                        <option value="LHR">London (LHR)</option>
-                        <option value="DXB">Dubai (DXB)</option>
-                        <option value="FRA">Frankfurt (FRA)</option>
-                      </optgroup>
-                      <optgroup label="APAC">
-                        <option value="HKG">Hong Kong (HKG)</option>
-                        <option value="SIN">Singapore (SIN)</option>
-                        <option value="NRT">Tokyo (NRT)</option>
-                        <option value="SYD">Sydney (SYD)</option>
-                      </optgroup>
-                      <optgroup label="LAC">
-                        <option value="GRU">São Paulo (GRU)</option>
-                        <option value="MEX">Mexico City (MEX)</option>
-                        <option value="BOG">Bogotá (BOG)</option>
-                      </optgroup>
-                    </>
+                  <option value="all">All Hubs</option>
+                  {filterTerritory === 'MEISA' && (
+                    <optgroup label="MEISA Hubs">
+                      <option value="BOMCL">Mumbai (BOMCL)</option>
+                      <option value="AMDVG">Ahmedabad (AMDVG)</option>
+                      <option value="GUXAT">Guwahati (GUXAT)</option>
+                      <option value="RAJAD">Jaipur (RAJAD)</option>
+                      <option value="MAAA">Chennai (MAAA)</option>
+                      <option value="DAEA">Delhi (DAEA)</option>
+                      <option value="DELCP">Delhi (DELCP)</option>
+                      <option value="BOMTP">Thane (BOMTP)</option>
+                      <option value="GUXKO">Kolkata (GUXKO)</option>
+                      <option value="AMDBH">Bengaluru (AMDBH)</option>
+                      <option value="BLRPE">Bengaluru (BLRPE)</option>
+                      <option value="BLRKR">Bengaluru (BLRKR)</option>
+                      <option value="MAAPE">Pune (MAAPE)</option>
+                    </optgroup>
+                  )}
+                  {filterTerritory === 'APAC' && (
+                    <optgroup label="APAC Hubs">
+                      <option value="SGNA">Singapore (SGNA)</option>
+                      <option value="JKTA">Jakarta (JKTA)</option>
+                      <option value="DADA">Danang (DADA)</option>
+                      <option value="BDQA">Bandung (BDQA)</option>
+                      <option value="BKKA">Bangkok (BKKA)</option>
+                      <option value="BAOA">Bangkok (BAOA)</option>
+                      <option value="CGKA">Chiang Mai (CGKA)</option>
+                      <option value="HLPA">Hanoi (HLPA)</option>
+                      <option value="SUBA">Surabaya (SUBA)</option>
+                      <option value="KWBA">Kuala Lumpur (KWBA)</option>
+                      <option value="QHIA">Ho Chi Minh (QHIA)</option>
+                      <option value="TDXA">Bangkok (TDXA)</option>
+                      <option value="CUJA">Cebu (CUJA)</option>
+                      <option value="DPSA">Denpasar (DPSA)</option>
+                      <option value="PAGA">Manila (PAGA)</option>
+                      <option value="KDTA">Khon Kaen (KDTA)</option>
+                    </optgroup>
                   )}
                 </select>
               </div>
@@ -326,7 +394,7 @@ const PredictiveRiskAnalytics = () => {
                 filteredShipments.map((shipment) => (
                   <button
                     key={shipment.id}
-                    onClick={() => setSelectedShipment(shipment)}
+                    onClick={() => handleSelectShipment(shipment)}
                     className={`w-full text-left p-4 border-l-4 transition-all hover:bg-gray-50 dark:hover:bg-gray-700 ${getRiskBg(
                       shipment.riskLevel
                     )} ${selectedShipment?.id === shipment.id ? 'ring-2 ring-[#4D148C]' : ''}`}
@@ -380,6 +448,9 @@ const PredictiveRiskAnalytics = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {selectedShipment.origin} → {selectedShipment.destination}
               </p>
+              {detailsLoading && (
+                <p className="text-xs text-gray-400 mt-2">Loading shipment details...</p>
+              )}
             </div>
             <button
               onClick={() => setSelectedShipment(null)}

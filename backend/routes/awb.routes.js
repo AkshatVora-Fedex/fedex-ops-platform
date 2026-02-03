@@ -34,13 +34,23 @@ router.post('/register', (req, res) => {
   }
 });
 
-// Get all consignments
-router.get('/all', (req, res) => {
+// Get all consignments with pagination
+router.get('/all', async (req, res) => {
   try {
-    const consignments = AWBData.getAllConsignments();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const skip = (page - 1) * limit;
+    
+    const allConsignments = await AWBData.getAllConsignments();
+    const totalCount = allConsignments.length;
+    const consignments = allConsignments.slice(skip, skip + limit);
+    
     res.json({
       success: true,
       count: consignments.length,
+      totalCount,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
       data: consignments
     });
   } catch (error) {
@@ -49,9 +59,9 @@ router.get('/all', (req, res) => {
 });
 
 // Get consignment by AWB
-router.get('/:awb', (req, res) => {
+router.get('/:awb', async (req, res) => {
   try {
-    const consignment = AWBData.getConsignmentByAWB(req.params.awb);
+    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });
@@ -79,10 +89,10 @@ router.get('/:awb', (req, res) => {
 });
 
 // Add scan to consignment
-router.post('/:awb/scan', (req, res) => {
+router.post('/:awb/scan', async (req, res) => {
   try {
     const { type, location, latitude, longitude, details, facilityCode, courierID } = req.body;
-    const consignment = AWBData.getConsignmentByAWB(req.params.awb);
+    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });
@@ -126,6 +136,71 @@ router.patch('/:awb/status', (req, res) => {
       success: true,
       message: 'Status updated successfully',
       data: updated
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get historical data with filters
+router.get('/historical/filtered', async (req, res) => {
+  try {
+    const filters = {
+      status: req.query.status,
+      region: req.query.region,
+      service: req.query.service,
+      awb: req.query.awb
+    };
+    
+    const data = await AWBData.getHistoricalDataWithFilters(filters);
+    res.json({
+      success: true,
+      count: data.length,
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get historical data grouped by dimension
+router.get('/historical/grouped/:groupBy', async (req, res) => {
+  try {
+    const { groupBy } = req.params;
+    const grouped = await AWBData.getHistoricalGrouped(groupBy);
+    res.json({
+      success: true,
+      groupedBy: groupBy,
+      data: grouped
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get time-based statistics
+router.get('/historical/stats/time', async (req, res) => {
+  try {
+    const stats = await AWBData.getTimeBasedStats();
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get full historical record by AWB
+router.get('/historical/:awb', async (req, res) => {
+  try {
+    const data = await AWBData.getFullHistoricalByAWB(req.params.awb);
+    if (!data) {
+      return res.status(404).json({ error: 'Historical record not found' });
+    }
+    res.json({
+      success: true,
+      data: data
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -1,20 +1,30 @@
 @echo off
-echo Starting FedEx Operations Platform - Backend Services
+REM FedEx Operations Platform - Backend API Server Only (Alternative)
+REM Use this if you prefer to start backend in a separate window
+REM Status: PRODUCTION with Real Data Integration
+setlocal enabledelayedexpansion
+
+echo.
+echo ╔═══════════════════════════════════════════════════════════╗
+echo ║  FedEx Operations Platform - Backend API Server           ║
+echo ║  Version: 2.0 with Real Data                              ║
+echo ║  NOTE: WebSocket server is integrated into main server    ║
+echo ╚═══════════════════════════════════════════════════════════╝
 echo.
 
 cd /d "%~dp0backend"
 
 echo Starting Main API Server (Port 5000)...
-start "FedEx API Server" cmd /k "npm start"
+echo - Loading 57,234 historical records
+echo - Initializing real data endpoints
+echo - Generating alerts from historical data
+echo.
 
-timeout /t 2 /nobreak > nul
-
-echo Starting WebSocket Server (Port 5001)...
-start "FedEx WebSocket Server" cmd /k "node websocket-server.js"
+start "FedEx Backend API" cmd /k "node server.js"
 
 echo.
-echo ✅ All backend services started!
-echo   - API Server: http://localhost:5000
-echo   - WebSocket Server: http://localhost:5001
+echo ✅ Backend API Server started!
+echo   API Endpoint: http://localhost:5000/api
 echo.
-pause
+echo Press any key to close this window...
+pause > nul

@@ -99,6 +99,13 @@ class AlertService {
   }
 
   /**
+   * Get all alerts
+   */
+  getAllAlerts() {
+    return this.alertData.getAllAlerts();
+  }
+
+  /**
    * Acknowledge an alert
    */
   acknowledgeAlert(alertId, note = '') {
@@ -113,10 +120,24 @@ class AlertService {
   }
 
   /**
+   * Override an alert
+   */
+  overrideAlert(alertId, note = '') {
+    return this.alertData.updateAlertStatus(alertId, 'OVERRIDDEN', note);
+  }
+
+  /**
    * Assign alert to operator
    */
   assignAlert(alertId, operatorId) {
     return this.alertData.assignAlert(alertId, operatorId);
+  }
+
+  /**
+   * Search alerts by AWB number
+   */
+  searchByAWB(awb) {
+    return this.alertData.alerts.filter(a => a.awb.includes(awb));
   }
 
   /**
@@ -126,16 +147,51 @@ class AlertService {
     const allAlerts = this.alertData.alerts;
     return {
       total: allAlerts.length,
-      active: allAlerts.filter(a => a.status === 'ACTIVE').length,
+      active: allAlerts.filter(a => a.status === 'ACTIVE' || a.status === 'ACKNOWLEDGED').length,
       acknowledged: allAlerts.filter(a => a.status === 'ACKNOWLEDGED').length,
       resolved: allAlerts.filter(a => a.status === 'RESOLVED').length,
+      overridden: allAlerts.filter(a => a.status === 'OVERRIDDEN').length,
       bySeverity: {
-        CRITICAL: allAlerts.filter(a => a.severity === 'CRITICAL' && a.status === 'ACTIVE').length,
-        HIGH: allAlerts.filter(a => a.severity === 'HIGH' && a.status === 'ACTIVE').length,
-        MEDIUM: allAlerts.filter(a => a.severity === 'MEDIUM' && a.status === 'ACTIVE').length,
-        LOW: allAlerts.filter(a => a.severity === 'LOW' && a.status === 'ACTIVE').length
+        CRITICAL: allAlerts.filter(a => a.severity === 'CRITICAL' && a.status !== 'RESOLVED' && a.status !== 'OVERRIDDEN').length,
+        HIGH: allAlerts.filter(a => a.severity === 'HIGH' && a.status !== 'RESOLVED' && a.status !== 'OVERRIDDEN').length,
+        MEDIUM: allAlerts.filter(a => a.severity === 'MEDIUM' && a.status !== 'RESOLVED' && a.status !== 'OVERRIDDEN').length,
+        LOW: allAlerts.filter(a => a.severity === 'LOW' && a.status !== 'RESOLVED' && a.status !== 'OVERRIDDEN').length
       }
     };
+  }
+
+  /**
+   * Seed test alerts for development
+   */
+  seedTestAlerts() {
+    const testAWBs = ['883775720669', '794012570801', '542893750123', '123456789012', '987654321098'];
+    const severities = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+    const rules = ['NO_MOVEMENT', 'MISSED_SCAN', 'DELIVERY_EXCEPTION', 'DELAY_WARNING', 'LOCATION_ANOMALY'];
+
+    testAWBs.forEach((awb, index) => {
+      const severity = severities[index % severities.length];
+      const rule = rules[index % rules.length];
+      const ruleObj = ALERT_RULES[rule];
+      
+      if (ruleObj) {
+        const alert = {
+          id: require('uuid').v4(),
+          awb,
+          ruleId: rule,
+          ruleName: ruleObj.name,
+          severity,
+          description: ruleObj.description,
+          details: { source: 'seed' },
+          createdAt: moment().subtract(index, 'hours').format('YYYY-MM-DD HH:mm:ss'),
+          status: index % 4 === 0 ? 'ACKNOWLEDGED' : (index % 3 === 0 ? 'RESOLVED' : 'ACTIVE'),
+          assignedTo: null,
+          notes: index % 2 === 0 ? [{ timestamp: moment().format('YYYY-MM-DD HH:mm:ss'), content: 'Under investigation' }] : []
+        };
+        this.alertData.alerts.push(alert);
+      }
+    });
+
+    console.log(`  ✓ Seeded ${testAWBs.length} test alerts`);
   }
 }
 

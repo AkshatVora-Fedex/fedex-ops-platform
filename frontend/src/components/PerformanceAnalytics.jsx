@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { alertService, predictiveService } from '../services/api';
+import { alertService, predictiveService, dashboardService, awbService } from '../services/api';
 
 const PerformanceAnalytics = () => {
   const [metrics, setMetrics] = useState(null);
@@ -13,13 +13,34 @@ const PerformanceAnalytics = () => {
 
   const loadMetrics = async () => {
     try {
-      const [alertRes, predRes] = await Promise.all([
+      const [alertRes, predRes, regionalRes, perfDistRes] = await Promise.all([
         alertService.getStats(),
         predictiveService.getMetrics(),
+        dashboardService.getRegionalMetrics(),
+        dashboardService.getPerformanceDistribution()
       ]);
 
       const alertData = alertRes.data.data || {};
       const predData = predRes.data.data || {};
+      const regionalData = regionalRes.data.data || {};
+      const perfData = perfDistRes.data.data || {};
+
+      // Transform regional data into team stats format
+      const teamStatsFromRegions = Object.keys(regionalData).map(region => ({
+        name: region,
+        resolved: regionalData[region].totalShipments || 0,
+        onTime: regionalData[region].onTime || 0,
+        rating: regionalData[region].onTime ? ((regionalData[region].onTime / regionalData[region].totalShipments) * 5).toFixed(1) : 0,
+        team: 'Regional',
+        delayed: regionalData[region].delayed || 0
+      }));
+
+      // Transform performance distribution into alert types
+      const topAlertTypesFromPerf = Object.keys(perfData).map(status => ({
+        type: status,
+        count: perfData[status],
+        change: status === 'EXCLUDE' ? '-5%' : '+3%'
+      })).slice(0, 5);
 
       setMetrics({
         totalAlerts: alertData.total || 0,
@@ -28,7 +49,7 @@ const PerformanceAnalytics = () => {
         alertAccuracy: predData.accuracy || 87,
         falsePositiveRate: predData.falsePositiveRate || 12,
         predictedVsActual: predData.predictedVsActual || { predicted: 145, actual: 152 },
-        topAlertTypes: [
+        topAlertTypes: topAlertTypesFromPerf.length > 0 ? topAlertTypesFromPerf : [
           { type: 'Delay Detection', count: 35, change: '+12%' },
           { type: 'Missed Scan', count: 28, change: '+8%' },
           { type: 'No Movement', count: 22, change: '-5%' },
@@ -37,7 +58,7 @@ const PerformanceAnalytics = () => {
         ],
       });
 
-      setTeamStats([
+      setTeamStats(teamStatsFromRegions.length > 0 ? teamStatsFromRegions : [
         { name: 'Alice Chen', resolved: 42, onTime: 96, rating: 4.8, team: 'Operations' },
         { name: 'Marcus Johnson', resolved: 38, onTime: 92, rating: 4.6, team: 'Operations' },
         { name: 'Sarah Williams', resolved: 35, onTime: 89, rating: 4.5, team: 'Dispatch' },
