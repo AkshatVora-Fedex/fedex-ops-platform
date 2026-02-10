@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import ConsignmentLookup from './components/ConsignmentLookup';
@@ -13,6 +13,7 @@ import Login from './components/Login';
 import GlobalCommand from './components/GlobalCommand';
 import HubPulse from './components/HubPulse';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import SplashScreen from './components/SplashScreen';
 
 function NavigationBar({ auth, onLogout }) {
   const location = useLocation();
@@ -193,14 +194,33 @@ function App() {
     const stored = localStorage.getItem('fedexOpsAuth');
     return stored ? JSON.parse(stored) : null;
   });
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Initial app loading splash screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 3000); // 3 seconds
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('fedexOpsAuth');
-    setAuth(null);
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem('fedexOpsAuth');
+      setAuth(null);
+      setIsLoggingOut(false);
+    }, 2500); // 2.5 seconds
   };
 
   const handleLogin = (authData) => {
-    setAuth(authData);
+    setIsLoggingIn(true);
+    setTimeout(() => {
+      setAuth(authData);
+      setIsLoggingIn(false);
+    }, 2500); // 2.5 seconds
   };
 
   const requireAuth = (element, allowedRoles) => {
@@ -208,6 +228,19 @@ function App() {
     if (allowedRoles && !allowedRoles.includes(auth.role)) return <Navigate to="/" replace />;
     return element;
   };
+
+  // Show splash screens for various states
+  if (isInitialLoading) {
+    return <SplashScreen type="loading" message="Loading OpsPulse" />;
+  }
+
+  if (isLoggingIn) {
+    return <SplashScreen type="login" />;
+  }
+
+  if (isLoggingOut) {
+    return <SplashScreen type="logout" />;
+  }
 
   return (
     <Router>

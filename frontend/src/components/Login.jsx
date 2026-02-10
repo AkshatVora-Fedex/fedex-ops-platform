@@ -17,9 +17,14 @@ const Login = ({ onLogin }) => {
       loggedInAt: new Date().toISOString()
     };
 
+    // Store auth data and trigger login (splash screen will show in App)
     localStorage.setItem('fedexOpsAuth', JSON.stringify(authData));
     onLogin(authData);
-    navigate('/');
+    
+    // Navigate after splash screen completes (handled by App timeout)
+    setTimeout(() => {
+      navigate('/');
+    }, 2500); // 2.5 seconds
   };
 
   return (
