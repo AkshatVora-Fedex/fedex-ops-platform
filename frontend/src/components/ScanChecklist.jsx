@@ -4,6 +4,19 @@ const ScanChecklist = ({ awb, serviceType = 'INTERNATIONAL_PRIORITY' }) => {
   const [checklist, setChecklist] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const formatLocation = (location) => {
+    if (!location) return 'Unknown';
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object') {
+      const parts = [];
+      if (location.locationCode) parts.push(location.locationCode);
+      if (location.postalCode) parts.push(location.postalCode);
+      if (location.megaRegion) parts.push(location.megaRegion);
+      return parts.length > 0 ? parts.join(', ') : 'Unknown';
+    }
+    return 'Unknown';
+  };
+
   // Expected scan progression based on service type
   const getScanProgression = (service) => {
     const progressions = {
@@ -137,7 +150,7 @@ const ScanChecklist = ({ awb, serviceType = 'INTERNATIONAL_PRIORITY' }) => {
                       <h4 className="text-sm font-bold text-gray-900">{scan.name}</h4>
                       <p className="text-xs text-gray-500 mt-0.5">
                         <span className="material-icons text-xs align-middle mr-1">place</span>
-                        {scan.location}
+                        {formatLocation(scan.location)}
                       </p>
                     </div>
                     <div className="text-right">

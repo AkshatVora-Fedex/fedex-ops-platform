@@ -251,7 +251,7 @@ const TrackingDetails = () => {
                     </div>
                     <p className="font-semibold text-gray-900 dark:text-white mb-1">
                       <span className="material-icons text-lg align-middle mr-2">location_on</span>
-                      {scan.location}
+                      {formatLocation(scan.location)}
                     </p>
                     {scan.description && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 ml-8">{scan.description}</p>
@@ -298,7 +298,7 @@ const TrackingDetails = () => {
                       </p>
                       {item.expected.appliesAt && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Applies at: {item.expected.appliesAt.stage} • {item.expected.appliesAt.location}
+                          Applies at: {item.expected.appliesAt.stage} • {formatLocation(item.expected.appliesAt.location)}
                         </p>
                       )}
                       {item.expected.routingRules && (
