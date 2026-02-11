@@ -434,6 +434,119 @@ class AWBData {
 
     return metrics;
   }
+
+  // Generate realistic scan timeline based on shipment data
+  static generateScanTimeline(historicalRecord) {
+    const scans = [];
+    const shipDate = new Date(historicalRecord.shipDate || new Date());
+    const deliveryDate = new Date(historicalRecord.deliveryDate || new Date(shipDate.getTime() + 3 * 24 * 60 * 60 * 1000));
+    
+    const scanCodes = ['PUX', 'STAT', 'DEX', 'INBS', 'OUTFS', 'OUTA', 'OUTB', 'OUTC', 'OUTD', 'DX'];
+    const hubs = ['MEM', 'IND', 'MCI', 'SEA', 'LAX', 'DFW', 'ATL', 'ORD', 'IAD'];
+    
+    // Pickup scan
+    scans.push({
+      scanCode: 'PUX',
+      timestamp: shipDate,
+      location: historicalRecord.origin?.locationCode || hubs[Math.floor(Math.random() * hubs.length)],
+      description: 'Package picked up',
+      locationType: 'origin'
+    });
+    
+    // In-transit scans
+    const transitDaysCount = Math.floor((deliveryDate - shipDate) / (1000 * 60 * 60 * 24));
+    for (let i = 1; i < transitDaysCount; i++) {
+      const scanTime = new Date(shipDate.getTime() + i * 24 * 60 * 60 * 1000 + Math.random() * 12 * 60 * 60 * 1000);
+      scans.push({
+        scanCode: scanCodes[Math.floor(Math.random() * (scanCodes.length - 2))],
+        timestamp: scanTime,
+        location: hubs[Math.floor(Math.random() * hubs.length)],
+        description: 'In transit',
+        locationType: 'hub'
+      });
+    }
+    
+    // Delivery scan
+    scans.push({
+      scanCode: 'DX',
+      timestamp: deliveryDate,
+      location: historicalRecord.destination?.locationCode || hubs[Math.floor(Math.random() * hubs.length)],
+      description: 'Delivered',
+      locationType: 'destination'
+    });
+    
+    return scans.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  }
+
+  // Generate geospatial route data for maps
+  static generateRouteData(historicalRecord) {
+    const originCoords = {
+      lat: historicalRecord.origin?.latitude || 35.1495 + (Math.random() - 0.5) * 20,
+      lng: historicalRecord.origin?.longitude || -90.0490 + (Math.random() - 0.5) * 20
+    };
+    
+    const destinationCoords = {
+      lat: historicalRecord.destination?.latitude || 40.7128 + (Math.random() - 0.5) * 20,
+      lng: historicalRecord.destination?.longitude || -74.0060 + (Math.random() - 0.5) * 20
+    };
+    
+    // Generate intermediate waypoints
+    const waypoints = [];
+    for (let i = 1; i <= 3; i++) {
+      const progress = i / 4;
+      waypoints.push({
+        lat: originCoords.lat + (destinationCoords.lat - originCoords.lat) * progress,
+        lng: originCoords.lng + (destinationCoords.lng - originCoords.lng) * progress,
+        hubName: `Hub ${i}`,
+        arrivalTime: new Date(new Date(historicalRecord.shipDate).getTime() + progress * 2 * 24 * 60 * 60 * 1000)
+      });
+    }
+    
+    return {
+      origin: originCoords,
+      destination: destinationCoords,
+      waypoints,
+      courierLocation: { ...originCoords, timestamp: new Date() }
+    };
+  }
+
+  // Get comprehensive shipment telemetry
+  static async getShipmentTelemetry(awb) {
+    const data = await loadHistoricalData();
+    const record = data.find(r => r.awb === awb);
+    
+    if (!record) {
+      return null;
+    }
+    
+    const scanTimeline = this.generateScanTimeline(record);
+    const routeData = this.generateRouteData(record);
+    const currentStatus = record.performance?.bucket || 'IN_TRANSIT';
+    
+    return {
+      awb: record.awb,
+      shipDate: record.shipDate,
+      deliveryDate: record.deliveryDate,
+      status: currentStatus,
+      origin: {
+        location: record.origin?.mdName || record.origin?.locationCode,
+        address: record.origin?.address,
+        coordinates: { lat: record.origin?.latitude, lng: record.origin?.longitude }
+      },
+      destination: {
+        location: record.destination?.mdName || record.destination?.locationCode,
+        address: record.destination?.address,
+        coordinates: { lat: record.destination?.latitude, lng: record.destination?.longitude }
+      },
+      scanTimeline,
+      routeData,
+      shipper: record.shipper,
+      recipient: record.recipient,
+      serviceType: typeof record.service === 'object' ? record.service?.type : record.service,
+      weight: record.weight,
+      dimensions: record.dimensions
+    };
+  }
 }
 
 module.exports = AWBData;

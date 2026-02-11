@@ -118,4 +118,22 @@ router.get('/:awb/location', async (req, res) => {
   }
 });
 
+// Get comprehensive shipment telemetry (scans, route, location)
+router.get('/:awb/telemetry', async (req, res) => {
+  try {
+    const telemetry = await AWBData.getShipmentTelemetry(req.params.awb);
+
+    if (!telemetry) {
+      return res.status(404).json({ error: 'Telemetry data not found' });
+    }
+
+    res.json({
+      success: true,
+      data: telemetry
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

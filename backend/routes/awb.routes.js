@@ -34,6 +34,47 @@ router.post('/register', (req, res) => {
   }
 });
 
+// Get unique LOC IDs (locations) for filtering
+router.get('/filters/locations', async (req, res) => {
+  try {
+    const allConsignments = await AWBData.getAllConsignments();
+    const locations = new Set();
+    
+    allConsignments.forEach(c => {
+      if (c.origin) locations.add(c.origin);
+      if (c.destination) locations.add(c.destination);
+    });
+    
+    res.json({
+      success: true,
+      count: locations.size,
+      data: Array.from(locations).sort()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get shipments filtered by location
+router.get('/filter/by-location/:location', async (req, res) => {
+  try {
+    const location = req.params.location;
+    const allConsignments = await AWBData.getAllConsignments();
+    
+    const filtered = allConsignments.filter(c => 
+      c.origin === location || c.destination === location
+    );
+    
+    res.json({
+      success: true,
+      count: filtered.length,
+      data: filtered
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get all consignments with pagination
 router.get('/all', async (req, res) => {
   try {

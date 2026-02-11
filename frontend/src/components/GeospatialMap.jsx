@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../styles/GeospatialMap.css';
+import { trackingService } from '../services/api';
 
 mapboxgl.accessToken = '***REMOVED***';
 
-function GeospatialMap({ awb }) {
+function GeospatialMap({ awb, telemetry }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const courierMarker = useRef(null);
@@ -13,36 +14,31 @@ function GeospatialMap({ awb }) {
   const [lat, setLat] = useState(35.149534);
   const [zoom, setZoom] = useState(9);
   const [routeData, setRouteData] = useState(null);
-  const [gpsPosition, setGpsPosition] = useState(null);
 
-  // Fetch route and GPS data
+  // Use telemetry data for route if available
   useEffect(() => {
-    const fetchRouteData = async () => {
-      try {
-        const routeResponse = await fetch(`http://localhost:5000/api/gps/route/${awb}`);
-        const routeResult = await routeResponse.json();
-        
-        if (routeResult.success) {
-          setRouteData(routeResult.data);
-        }
-
-        const gpsResponse = await fetch(`http://localhost:5000/api/gps/position/${awb}`);
-        const gpsResult = await gpsResponse.json();
-        
-        if (gpsResult.success) {
-          setGpsPosition(gpsResult.data);
-        }
-      } catch (error) {
-        console.error('Error fetching map data:', error);
+    if (telemetry?.routeData) {
+      setRouteData(telemetry.routeData);
+      // Center map on origin
+      if (telemetry.routeData.origin) {
+        setLat(telemetry.routeData.origin.lat);
+        setLng(telemetry.routeData.origin.lng);
       }
-    };
-
-    if (awb) {
+    } else if (awb) {
+      // Fallback to fetching telemetry if not provided
+      const fetchRouteData = async () => {
+        try {
+          const telemetryRes = await trackingService.getTelemetry(awb);
+          if (telemetryRes.data?.data?.routeData) {
+            setRouteData(telemetryRes.data.data.routeData);
+          }
+        } catch (error) {
+          console.error('Error fetching route data:', error);
+        }
+      };
       fetchRouteData();
-      const interval = setInterval(fetchRouteData, 5000); // Update every 5 seconds
-      return () => clearInterval(interval);
     }
-  }, [awb]);
+  }, [telemetry, awb]);
 
   // Initialize map
   useEffect(() => {

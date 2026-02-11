@@ -26,7 +26,8 @@ export const awbService = {
 export const trackingService = {
   getTracking: (awb) => apiClient.get(`/tracking/${awb}`),
   getChecklist: (awb) => apiClient.get(`/tracking/${awb}/checklist`),
-  getLocation: (awb) => apiClient.get(`/tracking/${awb}/location`)
+  getLocation: (awb) => apiClient.get(`/tracking/${awb}/location`),
+  getTelemetry: (awb) => apiClient.get(`/tracking/${awb}/telemetry`)
 };
 
 export const predictiveService = {

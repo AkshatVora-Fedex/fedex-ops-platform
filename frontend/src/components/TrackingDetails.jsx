@@ -8,6 +8,7 @@ import TelemetryFeed from './TelemetryFeed';
 const TrackingDetails = () => {
   const { awb } = useParams();
   const [tracking, setTracking] = useState(null);
+  const [telemetry, setTelemetry] = useState(null);
   const [prediction, setPrediction] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [checklist, setChecklist] = useState(null);
@@ -24,16 +25,18 @@ const TrackingDetails = () => {
 
   const loadTrackingData = async () => {
     try {
-      const [trackRes, predRes, alertRes, checklistRes] = await Promise.all([
+      const [trackRes, predRes, alertRes, checklistRes, telemetryRes] = await Promise.all([
         awbService.getByAWB(awb),
         predictiveService.getPrediction(awb),
         alertService.getByAWB(awb),
-        trackingService.getChecklist(awb)
+        trackingService.getChecklist(awb),
+        trackingService.getTelemetry(awb)
       ]);
       setTracking(trackRes.data.data);
       setPrediction(predRes.data.data.prediction);
       setAlerts(alertRes.data.data);
       setChecklist(checklistRes.data.data);
+      setTelemetry(telemetryRes.data.data);
     } catch (error) {
       console.error('Error loading tracking:', error);
     } finally {
@@ -215,38 +218,37 @@ const TrackingDetails = () => {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Scan Timeline</h3>
           <div className="space-y-4">
-            {tracking.scans.map((scan, idx) => (
-              <div key={idx} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="w-4 h-4 bg-[#4D148C] rounded-full border-4 border-white dark:border-gray-800"></div>
-                  {idx < tracking.scans.length - 1 && (
-                    <div className="w-1 h-16 bg-gray-300 dark:bg-gray-600"></div>
-                  )}
-                </div>
-                <div className="pb-8 flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getScanBadgeColor(scan.type)}`}>
-                      {scan.type}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(scan.timestamp).toLocaleString()}
-                    </span>
+            {telemetry?.scanTimeline && telemetry.scanTimeline.length > 0 ? (
+              telemetry.scanTimeline.map((scan, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="w-4 h-4 bg-[#4D148C] rounded-full border-4 border-white dark:border-gray-800"></div>
+                    {idx < telemetry.scanTimeline.length - 1 && (
+                      <div className="w-1 h-16 bg-gray-300 dark:bg-gray-600"></div>
+                    )}
                   </div>
-                  <p className="font-semibold text-gray-900 dark:text-white mb-1">
-                    <span className="material-icons text-lg align-middle mr-2">location_on</span>
-                    {scan.location}
-                  </p>
-                  {scan.details && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 ml-8">{scan.details}</p>
-                  )}
-                  {scan.facilityCode && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500 ml-8 mt-1">
-                      Facility: {scan.facilityCode} | Courier: {scan.courierID}
+                  <div className="pb-8 flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getScanBadgeColor(scan.scanCode)}`}>
+                        {scan.scanCode}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(scan.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="font-semibold text-gray-900 dark:text-white mb-1">
+                      <span className="material-icons text-lg align-middle mr-2">location_on</span>
+                      {scan.location}
                     </p>
-                  )}
+                    {scan.description && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 ml-8">{scan.description}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400">No scans available</p>
+            )}
           </div>
         </div>
       )}
@@ -426,7 +428,7 @@ const TrackingDetails = () => {
       {/* Live Map Tab */}
       {activeTab === 'map' && (
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700" style={{ height: '600px' }}>
-          <GeospatialMap awb={awb} />
+          <GeospatialMap awb={awb} telemetry={telemetry} />
         </div>
       )}
 

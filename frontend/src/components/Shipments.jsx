@@ -7,77 +7,68 @@ const Shipments = () => {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterRisk, setFilterRisk] = useState('all');
+  const [filterLocation, setFilterLocation] = useState('all');
+  const [locations, setLocations] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showAI, setShowAI] = useState(false);
 
   useEffect(() => {
-    loadShipments();
-  }, []);
+    loadLocations();
+    loadShipments(1);
+  }, [filterLocation]);
 
-  const loadShipments = async () => {
+  const loadLocations = async () => {
     try {
-      // Load only first 100 predictions with pagination
-      const response = await predictiveService.getAllPredictions({ page: 1, limit: 100 });
-      const predictions = response?.data?.data?.predictions;
-      if (Array.isArray(predictions) && predictions.length > 0) {
-        setShipments(predictions);
-      } else {
-        // Fall back to getting paginated AWB consignments (limit to 100 records)
-        const allAWBRes = await awbService.getAll({ page: 1, limit: 100 });
-        const consignments = allAWBRes.data.data || [];
-        
-        // Transform consignments into shipment display format
-        const transformedShipments = consignments.map(c => ({
-          awb: c.awb,
-          origin: c.origin,
-          destination: c.destination,
-          status: c.status || 'In Transit',
-          delayProbability: Math.random() * 80,
-          promiseDate: c.estimatedDelivery || new Date().toISOString(),
-          serviceType: c.serviceType || 'Standard',
-          shipper: c.shipper,
-          receiver: c.receiver,
-          isHistorical: c.isHistorical
-        }));
-        
-        setShipments(transformedShipments);
-      }
+      const res = await awbService.getAll({ page: 1, limit: 1000 });
+      const locs = new Set();
+      res.data.data?.forEach(s => {
+        if (s.origin) locs.add(s.origin);
+        if (s.destination) locs.add(s.destination);
+      });
+      setLocations(Array.from(locs).sort());
     } catch (error) {
-      console.error('Error loading shipments:', error);
-      setShipments(getDefaultShipments());
-    } finally {
-      setLoading(false);
+      console.error('Error loading locations:', error);
     }
   };
 
-  const getDefaultShipments = () => [
-    {
-      awb: '794644790128',
-      origin: 'Seattle, WA (SEA)',
-      destination: 'Miami, FL (MIA)',
-      status: 'Delayed',
-      delayProbability: 92,
-      promiseDate: 'Jan 21, 23:30',
-      serviceType: 'Priority Overnight'
-    },
-    {
-      awb: '794644790126',
-      origin: 'Memphis, TN (MEM)',
-      destination: 'New York, NY (JFK)',
-      status: 'At Risk',
-      delayProbability: 73,
-      promiseDate: 'Jan 21, 19:30',
-      serviceType: 'Priority Overnight'
-    },
-    {
-      awb: '794644790127',
-      origin: 'Los Angeles, CA (LAX)',
-      destination: 'Chicago, IL (ORD)',
-      status: 'On Time',
-      delayProbability: 12,
-      promiseDate: 'Jan 21, 21:30',
-      serviceType: 'Standard Overnight'
+  const loadShipments = async (pageNum) => {
+    try {
+      setLoading(true);
+      // Load real shipments with pagination
+      const allAWBRes = await awbService.getAll({ page: pageNum, limit: 50 });
+      let consignments = allAWBRes.data.data || [];
+      
+      // Filter by location if selected
+      if (filterLocation !== 'all') {
+        consignments = consignments.filter(c => 
+          c.origin === filterLocation || c.destination === filterLocation
+        );
+      }
+      
+      // Transform to shipment format
+      const transformedShipments = consignments.map(c => ({
+        awb: c.awb,
+        origin: c.origin,
+        destination: c.destination,
+        status: c.status || 'In Transit',
+        delayProbability: (Math.random() * 100),
+        promiseDate: c.estimatedDelivery || new Date().toISOString(),
+        serviceType: c.serviceType || 'Standard',
+        shipper: c.shipper,
+        receiver: c.receiver,
+        isHistorical: c.isHistorical
+      }));
+      
+      setShipments(transformedShipments);
+      setPage(pageNum);
+      setTotalPages(Math.ceil((allAWBRes.data.totalCount || 0) / 50));
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading shipments:', error);
+      setLoading(false);
     }
-  ];
+  };
 
   const resolveStatus = (shipment) => {
     if (shipment.status) return shipment.status;
@@ -161,6 +152,19 @@ const Shipments = () => {
 
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex flex-wrap gap-4 items-center">
         <div className="flex items-center gap-2">
+          <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Location (LOC ID)</label>
+          <select
+            value={filterLocation}
+            onChange={(e) => setFilterLocation(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white"
+          >
+            <option value="all">All Locations</option>
+            {locations.map(loc => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
           <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Status</label>
           <select
             value={filterStatus}
@@ -235,6 +239,31 @@ const Shipments = () => {
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Page {page} of {totalPages} (Showing {shipments.length} shipments)
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => loadShipments(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <span className="material-icons text-sm align-middle">chevron_left</span>
+            Previous
+          </button>
+          <button
+            onClick={() => loadShipments(Math.min(totalPages, page + 1))}
+            disabled={page >= totalPages}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            Next
+            <span className="material-icons text-sm align-middle">chevron_right</span>
+          </button>
+        </div>
       </div>
     </div>
   );
