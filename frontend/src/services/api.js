@@ -15,6 +15,7 @@ export const awbService = {
   getByAWB: (awb) => apiClient.get(`/awb/${awb}`),
   addScan: (awb, scanData) => apiClient.post(`/awb/${awb}/scan`, scanData),
   updateStatus: (awb, status) => apiClient.patch(`/awb/${awb}/status`, { status }),
+  getLocations: () => apiClient.get('/awb/filters/locations'),
   
   // Historical data endpoints
   getHistoricalFiltered: (filters) => apiClient.get('/awb/historical/filtered', { params: filters }),

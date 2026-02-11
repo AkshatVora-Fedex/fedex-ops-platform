@@ -20,13 +20,8 @@ const Shipments = () => {
 
   const loadLocations = async () => {
     try {
-      const res = await awbService.getAll({ page: 1, limit: 1000 });
-      const locs = new Set();
-      res.data.data?.forEach(s => {
-        if (s.origin) locs.add(s.origin);
-        if (s.destination) locs.add(s.destination);
-      });
-      setLocations(Array.from(locs).sort());
+      const res = await awbService.getLocations();
+      setLocations(res.data.data || []);
     } catch (error) {
       console.error('Error loading locations:', error);
     }
