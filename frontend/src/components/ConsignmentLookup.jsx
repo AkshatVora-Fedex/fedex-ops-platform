@@ -14,29 +14,47 @@ const ConsignmentLookup = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!awb.trim()) {
+    const awbValue = awb.trim();
+    if (!awbValue) {
       setError('Please enter an AWB');
       return;
     }
 
     setLoading(true);
     setError(null);
+    setConsignment(null);
+    
     try {
-      // Use new searchService with fallback to awbService
+      console.log(`[Search] Looking for AWB: ${awbValue}`);
+      
+      // Try search endpoint first
       try {
-        const response = await searchService.searchAWB(awb);
+        console.log('[Search] Trying search endpoint...');
+        const response = await searchService.searchAWB(awbValue);
+        console.log('[Search] Found via search endpoint:', response.data.data?.awb);
         setConsignment(response.data.data);
+        return;
       } catch (searchErr) {
-        // Try getting from AWB service (which includes historical data)
-        try {
-          const response = await awbService.getHistoricalByAWB(awb);
-          setConsignment(response.data.data);
-        } catch (awbErr) {
-          throw new Error('Consignment not found');
-        }
+        console.log('[Search] Search endpoint failed:', searchErr.message);
       }
+      
+      // Fallback to historical endpoint
+      try {
+        console.log('[Search] Trying historical endpoint...');
+        const response = await awbService.getHistoricalByAWB(awbValue);
+        console.log('[Search] Found via historical endpoint:', response.data.data?.awb);
+        setConsignment(response.data.data);
+        return;
+      } catch (awbErr) {
+        console.log('[Search] Historical endpoint failed:', awbErr.message);
+      }
+      
+      // If we get here, AWB was not found
+      setError(`Consignment not found for AWB: ${awbValue}. Try viewing sample AWBs by clicking "View Sample AWBs" or upload a file to add more records.`);
+      setConsignment(null);
     } catch (err) {
-      setError('Consignment not found. Check the AWB number. You can view sample AWBs by clicking "View Samples" below.');
+      console.error('[Search] Unexpected error:', err);
+      setError(`Error searching for AWB: ${err.message}`);
       setConsignment(null);
     } finally {
       setLoading(false);

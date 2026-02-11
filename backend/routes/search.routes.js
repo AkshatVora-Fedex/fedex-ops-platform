@@ -59,8 +59,8 @@ router.get('/samples/list', async (req, res) => {
       awb: record.awb,
       status: record.performance?.bucket || record.status || 'IN_TRANSIT',
       service: (typeof record.service === 'object' ? record.service?.type : record.service) || 'Standard',
-      origin: record.origin?.mdName || record.origin?.locationCode || 'Unknown',
-      destination: record.destination?.mdName || record.destination?.locationCode || 'Unknown'
+      origin: record.origin?.locationCode || record.origin?.postalCode || 'Unknown',
+      destination: record.destination?.locationCode || record.destination?.postalCode || 'Unknown'
     }));
 
     res.json({
