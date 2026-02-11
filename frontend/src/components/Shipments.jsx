@@ -36,9 +36,11 @@ const Shipments = () => {
       
       // Filter by location if selected
       if (filterLocation !== 'all') {
-        consignments = consignments.filter(c => 
-          c.origin === filterLocation || c.destination === filterLocation
-        );
+        consignments = consignments.filter(c => {
+          const originCode = typeof c.origin === 'string' ? c.origin : c.origin?.locationCode;
+          const destCode = typeof c.destination === 'string' ? c.destination : c.destination?.locationCode;
+          return originCode === filterLocation || destCode === filterLocation;
+        });
       }
       
       // Transform to shipment format
@@ -103,6 +105,19 @@ const Shipments = () => {
       'Delayed': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
     };
     return styles[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+  };
+
+  const formatLocation = (location) => {
+    if (!location) return 'Unknown';
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object') {
+      const parts = [];
+      if (location.locationCode) parts.push(location.locationCode);
+      if (location.postalCode) parts.push(location.postalCode);
+      if (location.megaRegion) parts.push(location.megaRegion);
+      return parts.length > 0 ? parts.join(', ') : 'Unknown';
+    }
+    return 'Unknown';
   };
 
   if (loading) {
@@ -211,8 +226,8 @@ const Shipments = () => {
               return (
                 <tr key={shipment.awb} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 text-sm font-mono text-gray-900 dark:text-white">{shipment.awb}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{shipment.origin}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{shipment.destination}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{formatLocation(shipment.origin)}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">{formatLocation(shipment.destination)}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusStyle(status)}`}>
                       {status}

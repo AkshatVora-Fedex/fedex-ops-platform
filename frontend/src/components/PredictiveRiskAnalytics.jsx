@@ -81,7 +81,23 @@ const PredictiveRiskAnalytics = () => {
     }
   };
 
-  const getLocationText = (value) => (value || '').toString().toUpperCase();
+  const formatLocation = (location) => {
+    if (!location) return 'Unknown';
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object') {
+      const parts = [];
+      if (location.locationCode) parts.push(location.locationCode);
+      if (location.postalCode) parts.push(location.postalCode);
+      if (location.megaRegion) parts.push(location.megaRegion);
+      return parts.length > 0 ? parts.join(', ') : 'Unknown';
+    }
+    return 'Unknown';
+  };
+
+  const getLocationText = (value) => {
+    const formatted = formatLocation(value);
+    return formatted.toUpperCase();
+  };
 
   const formatProbability = (value) => {
     const numeric = Number(value);
@@ -405,7 +421,7 @@ const PredictiveRiskAnalytics = () => {
                           {shipment.awb}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {shipment.origin} → {shipment.destination}
+                          {formatLocation(shipment.origin)} → {formatLocation(shipment.destination)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -446,7 +462,7 @@ const PredictiveRiskAnalytics = () => {
                 {selectedShipment.awb}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {selectedShipment.origin} → {selectedShipment.destination}
+                {formatLocation(selectedShipment.origin)} → {formatLocation(selectedShipment.destination)}
               </p>
               {detailsLoading && (
                 <p className="text-xs text-gray-400 mt-2">Loading shipment details...</p>

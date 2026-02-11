@@ -67,7 +67,7 @@
 <div class="text-white/70 group-focus-within:text-fedex-purple flex items-center justify-center pl-3 pr-2">
 <span class="material-symbols-outlined text-[20px]">search</span>
 </div>
-<input class="w-full bg-transparent border-none text-sm text-white focus:text-fedex-purple focus:ring-0 placeholder:text-white/60" placeholder="Search AWB, Flight #, or Location ID"/>
+<input class="w-full bg-transparent border-none text-sm text-white focus:text-fedex-purple focus:ring-0 placeholder:text-white/60" aria-label="Search AWB, Flight #, or Location ID" placeholder="Search AWB, Flight #, or Location ID" type="text"/>
 </div>
 </div>
 </div>
@@ -264,7 +264,7 @@
 <div class="space-y-1">
 <label class="text-xs font-bold text-text-secondary uppercase">Reason Code</label>
 <div class="relative">
-<select class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
+<select title="Select reason code for the corrective action" class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
 <option>SORT_ERR_01 (Sortation Error)</option>
 <option>LBL_DMG_04 (Label Damaged)</option>
 <option>FLT_CNCL_02 (Flight Cancellation)</option>
@@ -275,7 +275,7 @@
 <div class="space-y-1">
 <label class="text-xs font-bold text-text-secondary uppercase">New Destination Hub</label>
 <div class="relative">
-<select class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
+<select title="Select new destination hub for the package" class="w-full bg-white border border-surface-border rounded-lg text-text-primary text-sm font-medium focus:ring-2 focus:ring-fedex-purple/20 focus:border-fedex-purple py-2.5 pl-3 pr-10 appearance-none shadow-sm">
 <option>MEM (Memphis SuperHub)</option>
 <option>IND (Indianapolis)</option>
 <option>CDG (Paris Charles de Gaulle)</option>
@@ -357,7 +357,7 @@
 </div>
 <div class="p-3 border-t border-surface-border bg-gray-50">
 <div class="flex gap-2">
-<input class="w-full bg-white border border-surface-border rounded px-3 py-2 text-xs text-text-primary font-medium placeholder:text-text-secondary/60 focus:ring-1 focus:ring-fedex-purple focus:border-fedex-purple shadow-sm" placeholder="Add a quick observation..."/>
+<input class="w-full bg-white border border-surface-border rounded px-3 py-2 text-xs text-text-primary font-medium placeholder:text-text-secondary/60 focus:ring-1 focus:ring-fedex-purple focus:border-fedex-purple shadow-sm" aria-label="Add a quick observation" placeholder="Add a quick observation..." type="text"/>
 <button class="bg-fedex-purple text-white p-2 rounded shadow hover:bg-fedex-purple/90 transition-colors flex items-center justify-center">
 <span class="material-symbols-outlined text-[18px]">send</span>
 </button>

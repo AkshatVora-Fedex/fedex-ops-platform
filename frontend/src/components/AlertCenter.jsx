@@ -111,6 +111,19 @@ const AlertCenter = () => {
     return value;
   };
 
+  const formatLocation = (location) => {
+    if (!location) return 'Unknown';
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object') {
+      const parts = [];
+      if (location.locationCode) parts.push(location.locationCode);
+      if (location.postalCode) parts.push(location.postalCode);
+      if (location.megaRegion) parts.push(location.megaRegion);
+      return parts.length > 0 ? parts.join(', ') : 'Unknown';
+    }
+    return 'Unknown';
+  };
+
   const filteredAlerts = alerts.filter((alert) => {
     const normalizedStatus = normalizeStatus(alert.status);
     const matchStatus = filterStatus === 'all' || normalizedStatus === filterStatus;
@@ -326,12 +339,12 @@ const AlertCenter = () => {
                     <div className="flex items-center gap-3 text-sm opacity-90">
                       <div className="flex items-center gap-1">
                         <span className="material-icons text-sm">flight_takeoff</span>
-                        <span>{formatValue(selectedConsignment?.origin)}</span>
+                        <span>{formatLocation(selectedConsignment?.origin)}</span>
                       </div>
                       <span>→</span>
                       <div className="flex items-center gap-1">
                         <span className="material-icons text-sm">flight_land</span>
-                        <span>{formatValue(selectedConsignment?.destination)}</span>
+                        <span>{formatLocation(selectedConsignment?.destination)}</span>
                       </div>
                     </div>
                     {consignmentLoading && (
@@ -348,7 +361,7 @@ const AlertCenter = () => {
                   </div>
                 </div>
                 <div className="bg-white/10 rounded px-3 py-2 inline-block text-xs font-bold">
-                  CURRENT STATUS: {formatValue(selectedConsignment?.currentLocation)} • {normalizeStatus(selectedAlert.status)}
+                  CURRENT STATUS: {formatLocation(selectedConsignment?.currentLocation)} • {normalizeStatus(selectedAlert.status)}
                 </div>
               </div>
 
@@ -471,7 +484,7 @@ const AlertCenter = () => {
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Current Location</span>
-                          <span className="font-bold text-gray-900 dark:text-white">{formatValue(selectedConsignment?.currentLocation)}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{formatLocation(selectedConsignment?.currentLocation)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>

@@ -118,30 +118,24 @@ class AWBData {
     // Then check historical data
     const historical = data.find(record => record.awb === awb);
     if (historical) {
-      // Convert historical record to consignment format
+      // Convert historical record to consignment format with full details
       const serviceType = typeof historical.service === 'object' 
         ? historical.service?.type || 'Priority'
         : historical.service || 'Priority';
-        
-      const originLocation = historical.origin?.locationCode || 
-                            historical.origin?.postalCode || 
-                            'Unknown';
-      const destLocation = historical.destination?.locationCode || 
-                          historical.destination?.postalCode || 
-                          'Unknown';
       
       return {
         awb: historical.awb,
-        shipper: historical.shipper?.companyName || 'Unknown',
-        receiver: historical.recipient?.companyName || 'Unknown',
-        origin: originLocation,
-        destination: destLocation,
+        masterAWB: historical.masterAWB,
+        shipper: historical.shipper || { companyName: 'Unknown' },
+        receiver: historical.recipient || { companyName: 'Unknown' },
+        origin: historical.origin || { locationCode: 'Unknown' },
+        destination: historical.destination || { locationCode: 'Unknown' },
         weight: (Math.random() * 15 + 5).toFixed(1),
         serviceType: serviceType,
         createdAt: historical.shipDate || new Date().toISOString(),
         estimatedDelivery: historical.serviceCommitDate || new Date().toISOString(),
         status: historical.performance?.bucket || 'IN_TRANSIT',
-        currentLocation: originLocation,
+        currentLocation: historical.origin?.locationCode || historical.origin?.postalCode || 'Unknown',
         lastScan: historical.pickupScanDate,
         scans: [],
         region: historical.origin?.region,
@@ -495,7 +489,7 @@ class AWBData {
       waypoints.push({
         lat: originCoords.lat + (destinationCoords.lat - originCoords.lat) * progress,
         lng: originCoords.lng + (destinationCoords.lng - originCoords.lng) * progress,
-        hubName: `Hub ${i}`,
+        hubName: 'Hub ' + i,
         arrivalTime: new Date(new Date(historicalRecord.shipDate).getTime() + progress * 2 * 24 * 60 * 60 * 1000)
       });
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
@@ -120,7 +120,7 @@
 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[#ab9db9]">
 <span class="material-symbols-outlined text-[20px]">search</span>
 </span>
-<input class="h-9 w-64 rounded-lg border-none bg-background-dark pl-10 text-sm text-white focus:ring-1 focus:ring-primary placeholder-[#ab9db9]" placeholder="Search rules..." type="text"/>
+<input class="h-9 w-64 rounded-lg border-none bg-background-dark pl-10 text-sm text-white focus:ring-1 focus:ring-primary placeholder-[#ab9db9]" aria-label="Search rules..." placeholder="Search rules..." type="text"/>
 </div>
 <button class="text-[#ab9db9] hover:text-white relative">
 <span class="material-symbols-outlined">notifications</span>
@@ -178,7 +178,7 @@
 </div>
 <div class="flex items-center gap-2 text-xs text-[#ab9db9]">
 <span>Sorted by:</span>
-<select class="bg-transparent border-none p-0 text-white font-medium focus:ring-0 text-xs cursor-pointer">
+<select title="Select option" class="bg-transparent border-none p-0 text-white font-medium focus:ring-0 text-xs cursor-pointer">
 <option>Risk Level (High-Low)</option>
 <option>Newest First</option>
 <option>Alphabetical</option>
@@ -203,7 +203,7 @@
 </div>
 <!-- Toggle -->
 <label class="relative inline-flex cursor-pointer items-center">
-<input checked="" class="peer sr-only" type="checkbox" value=""/>
+<input checked="" aria-label="Enable geofence alert rule" class="peer sr-only" type="checkbox" value=""/>
 <div class="peer h-6 w-11 rounded-full bg-gray-700 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:border after:border-gray-300 after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
 </label>
 </div>
@@ -230,7 +230,7 @@
 </div>
 </div>
 <label class="relative inline-flex cursor-pointer items-center">
-<input checked="" class="peer sr-only" type="checkbox" value=""/>
+<input aria-label="Enable late scan alert rule" class="peer sr-only" type="checkbox" value=""/>
 <div class="peer h-6 w-11 rounded-full bg-gray-700 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:border after:border-gray-300 after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
 </label>
 </div>
@@ -257,7 +257,7 @@
 </div>
 </div>
 <label class="relative inline-flex cursor-pointer items-center">
-<input class="peer sr-only" type="checkbox" value=""/>
+<input aria-label="Enable idle package alert rule" class="peer sr-only" type="checkbox" value=""/>
 <div class="peer h-6 w-11 rounded-full bg-gray-700 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:border after:border-gray-300 after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
 </label>
 </div>
@@ -284,7 +284,7 @@
 <!-- Rule Name -->
 <div class="flex flex-col gap-1.5">
 <label class="text-xs font-medium text-[#ab9db9] uppercase tracking-wider">Rule Name</label>
-<input class="rounded-lg border border-border-dark bg-background-dark p-2.5 text-sm text-white placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="e.g. Hub Conveyor Jam" type="text"/>
+<input class="rounded-lg border border-border-dark bg-background-dark p-2.5 text-sm text-white placeholder-gray-500 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" aria-label="e.g. Hub Conveyor Jam" placeholder="e.g. Hub Conveyor Jam" type="text"/>
 </div>
 <!-- Trigger Logic -->
 <div class="flex flex-col gap-3">
@@ -292,7 +292,7 @@
 <div class="grid grid-cols-2 gap-3">
 <div class="flex flex-col gap-1">
 <span class="text-[10px] text-gray-500">Scan Type</span>
-<select class="w-full rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
+<select title="Select option" class="w-full rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
 <option>STAT Scan</option>
 <option>DEX Scan</option>
 <option>PUX Scan</option>
@@ -301,7 +301,7 @@
 </div>
 <div class="flex flex-col gap-1">
 <span class="text-[10px] text-gray-500">Operator</span>
-<select class="w-full rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
+<select title="Select option" class="w-full rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
 <option>Greater Than</option>
 <option>Less Than</option>
 <option>Equal To</option>
@@ -310,8 +310,8 @@
 </div>
 </div>
 <div class="flex items-center gap-2">
-<input class="flex-1 rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary" placeholder="Value" type="number"/>
-<select class="w-24 rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
+<input class="flex-1 rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary" aria-label="Value" placeholder="Value" type="number"/>
+<select title="Select option" class="w-24 rounded-lg border border-border-dark bg-background-dark p-2 text-sm text-white focus:border-primary focus:ring-primary">
 <option>Mins</option>
 <option>Hours</option>
 <option>Miles</option>
@@ -323,19 +323,19 @@
 <label class="text-xs font-medium text-[#ab9db9] uppercase tracking-wider">Risk Level</label>
 <div class="grid grid-cols-3 gap-2">
 <label class="cursor-pointer">
-<input class="peer sr-only" name="risk" type="radio"/>
+<input class="peer sr-only" name="risk" type="radio" aria-label="Critical risk level"/>
 <div class="rounded-md border border-border-dark bg-background-dark py-2 text-center text-xs font-medium text-gray-400 peer-checked:border-red-500/50 peer-checked:bg-red-500/10 peer-checked:text-red-500 transition-all hover:bg-white/5">
                                                     Critical
                                                 </div>
 </label>
 <label class="cursor-pointer">
-<input class="peer sr-only" name="risk" type="radio"/>
+<input class="peer sr-only" name="risk" type="radio" aria-label="High risk level"/>
 <div class="rounded-md border border-border-dark bg-background-dark py-2 text-center text-xs font-medium text-gray-400 peer-checked:border-fedex-orange/50 peer-checked:bg-fedex-orange/10 peer-checked:text-fedex-orange transition-all hover:bg-white/5">
                                                     High
                                                 </div>
 </label>
 <label class="cursor-pointer">
-<input class="peer sr-only" name="risk" type="radio"/>
+<input class="peer sr-only" name="risk" type="radio" aria-label="Medium risk level"/>
 <div class="rounded-md border border-border-dark bg-background-dark py-2 text-center text-xs font-medium text-gray-400 peer-checked:border-yellow-500/50 peer-checked:bg-yellow-500/10 peer-checked:text-yellow-500 transition-all hover:bg-white/5">
                                                     Medium
                                                 </div>
@@ -350,7 +350,7 @@
                                                 Ops Team
                                                 <span class="material-symbols-outlined text-[12px] cursor-pointer hover:text-white">close</span>
 </span>
-<input class="flex-1 bg-transparent border-none p-0 text-sm text-white placeholder-gray-600 focus:ring-0 min-w-[60px]" placeholder="Add team..." type="text"/>
+<input class="flex-1 bg-transparent border-none p-0 text-sm text-white placeholder-gray-600 focus:ring-0 min-w-[60px]" aria-label="Add team..." placeholder="Add team..." type="text"/>
 </div>
 </div>
 <!-- Actions -->

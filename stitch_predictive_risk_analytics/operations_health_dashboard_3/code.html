@@ -1,7 +1,4 @@
-<html lang="en"><head></head><body class="bg-[var(--bg-main)] h-screen flex flex-col overflow-hidden">```html
-
-
-
+﻿<html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Operations Health Dashboard</title>
@@ -37,7 +34,8 @@
             color: white;
         }
     </style>
-
+</head>
+<body class="bg-[var(--bg-main)] h-screen flex flex-col overflow-hidden">
 
 <header class="bg-[var(--fedex-purple)] shadow-md z-30 flex-shrink-0">
 <div class="px-4 sm:px-6 lg:px-8">
@@ -87,7 +85,7 @@
 <div class="space-y-4">
 <div>
 <label class="block text-[11px] font-medium text-purple-200 mb-1.5 ml-1">Region</label>
-<select class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
+<select title="Select option" class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
 <option value="">All Regions</option>
 <option value="APAC">APAC (Asia Pacific)</option>
 <option value="EMEA">EMEA (Europe, Mid East)</option>
@@ -98,7 +96,7 @@
 <div>
 <label class="block text-[11px] font-medium text-purple-200 mb-1.5 ml-1">Service Type</label>
 <div class="space-y-1.5">
-<select class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
+<select title="Select option" class="sidebar-select block w-full rounded-md border-transparent focus:ring-0 focus:border-transparent cursor-pointer">
 <option value="">All Service Types</option>
 <option value="PO">Priority Overnight</option>
 <option value="IF">International First</option>
@@ -231,10 +229,10 @@
 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 <span class="material-symbols-outlined text-gray-400">search</span>
 </div>
-<input class="block w-full pl-10 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] focus:border-transparent shadow-sm" placeholder="Search by AWB, Location, or Flight #" type="text"/>
+<input class="block w-full pl-10 pr-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] focus:border-transparent shadow-sm" aria-label="Search by AWB, Location, or Flight #" placeholder="Search by AWB, Location, or Flight #" type="text"/>
 </div>
 <div class="flex space-x-3">
-<select class="block w-44 pl-3 pr-10 py-2.5 text-sm bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] rounded-lg shadow-sm">
+<select title="Select option" class="block w-44 pl-3 pr-10 py-2.5 text-sm bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--fedex-purple)] rounded-lg shadow-sm">
 <option>Status: All</option>
 <option>Status: In Transit</option>
 <option>Status: Delayed</option>

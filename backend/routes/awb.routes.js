@@ -104,7 +104,8 @@ router.get('/all', async (req, res) => {
 // Get consignment by AWB
 router.get('/:awb', async (req, res) => {
   try {
-    const consignment = await AWBData.getConsignmentByAWB(req.params.awb);
+    const awb = req.params.awb;
+    const consignment = await AWBData.getConsignmentByAWB(awb);
 
     if (!consignment) {
       return res.status(404).json({ error: 'Consignment not found' });
@@ -117,7 +118,7 @@ router.get('/:awb', async (req, res) => {
       consignment.serviceType
     );
     const prediction = PredictiveService.predictDelay(consignment);
-    const alerts = AlertService.getAlertsByAWB(req.params.awb);
+    const alerts = AlertService.getAlertsByAWB(awb);
 
     res.json({
       success: true,

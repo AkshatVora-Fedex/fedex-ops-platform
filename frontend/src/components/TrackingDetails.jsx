@@ -61,6 +61,19 @@ const TrackingDetails = () => {
     return colors[riskLevel] || 'from-gray-500 to-gray-600';
   };
 
+  const formatLocation = (location) => {
+    if (!location) return 'Unknown';
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object') {
+      const parts = [];
+      if (location.locationCode) parts.push(location.locationCode);
+      if (location.postalCode) parts.push(location.postalCode);
+      if (location.megaRegion) parts.push(location.megaRegion);
+      return parts.length > 0 ? parts.join(', ') : 'Unknown';
+    }
+    return 'Unknown';
+  };
+
   const getScanBadgeColor = (scanType) => {
     const colors = {
       PUX: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -159,7 +172,7 @@ const TrackingDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <span className="material-icons text-green-600 dark:text-green-400 text-3xl">flight_takeoff</span>
-            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{tracking.origin}</p>
+            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{formatLocation(tracking.origin)}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">Origin</p>
           </div>
 
@@ -169,7 +182,7 @@ const TrackingDetails = () => {
 
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <span className="material-icons text-blue-600 dark:text-blue-400 text-3xl">location_on</span>
-            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{tracking.currentLocation}</p>
+            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{formatLocation(tracking.currentLocation)}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">Current</p>
           </div>
 
@@ -179,7 +192,7 @@ const TrackingDetails = () => {
 
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <span className="material-icons text-[#FF6600] text-3xl">flight_land</span>
-            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{tracking.destination}</p>
+            <p className="mt-2 font-semibold text-gray-900 dark:text-white">{formatLocation(tracking.destination)}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">Destination</p>
           </div>
         </div>

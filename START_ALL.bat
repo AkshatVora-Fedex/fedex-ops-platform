@@ -15,6 +15,15 @@ echo.
 REM Set Node path
 set PATH=C:\Program Files\nodejs;%PATH%
 
+REM Verify Node is installed
+where /q node
+if errorlevel 1 (
+    echo ❌ ERROR: Node.js is not installed or not in PATH
+    echo Please install Node.js from https://nodejs.org
+    pause
+    exit /b 1
+)
+
 REM Kill any existing processes on our ports
 echo Cleaning up any existing processes on ports 3000 and 5000...
 taskkill /F /IM node.exe 2>nul
@@ -29,7 +38,11 @@ echo ║  - Generating real alerts from historical data               ║
 echo ║  - Initializing real data endpoints                          ║
 echo ╚══════════════════════════════════════════════════════════════╝
 cd /d "%~dp0backend"
-start "FedEx Backend API" node server.js
+if not exist node_modules (
+    echo Installing backend dependencies...
+    call npm install
+)
+start "FedEx Backend API" cmd /k "node server.js"
 
 echo Waiting for backend to initialize (5 seconds)...
 timeout /t 5 /nobreak > nul
@@ -43,7 +56,11 @@ echo ║  - Loading dashboard with live metrics                       ║
 echo ║  - Ready for operational use                                 ║
 echo ╚══════════════════════════════════════════════════════════════╝
 cd /d "%~dp0frontend"
-start "FedEx Frontend" node node_modules/react-scripts/bin/react-scripts.js start
+if not exist node_modules (
+    echo Installing frontend dependencies...
+    call npm install
+)
+start "FedEx Frontend" cmd /k "npm start"
 
 echo.
 echo.
@@ -51,12 +68,9 @@ echo ╔════════════════════════
 echo ║                 ✅ ALL SERVICES STARTED                    ║
 echo ╠════════════════════════════════════════════════════════════╣
 echo ║  Backend API:    http://localhost:5000                    ║
-echo ║  WebSocket:      ws://localhost:5001                      ║
 echo ║  Frontend:       http://localhost:3000                    ║
 echo ╠════════════════════════════════════════════════════════════╣
 echo ║  Dashboard will open automatically in browser             ║
-echo ║  Login with: admin / admin123                             ║
-echo ║                                                            ║
 echo ║  Services running in separate windows                     ║
 echo ║  Close windows individually to stop services              ║
 echo ╚════════════════════════════════════════════════════════════╝

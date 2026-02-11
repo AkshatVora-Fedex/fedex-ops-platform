@@ -14,12 +14,26 @@ echo.
 REM Set Node path
 set PATH=C:\Program Files\nodejs;%PATH%
 
+REM Verify Node is installed
+where /q node
+if errorlevel 1 (
+    echo ❌ ERROR: Node.js is not installed or not in PATH
+    echo Please install Node.js from https://nodejs.org
+    pause
+    exit /b 1
+)
+
 REM Change to frontend directory
 cd /d "%~dp0frontend"
 
 echo.
 echo Checking dependencies...
-call npm install --silent
+if not exist node_modules (
+    echo Installing frontend dependencies...
+    call npm install
+) else (
+    echo Dependencies already installed
+)
 
 echo.
 echo ╔═══════════════════════════════════════════════════════════╗
@@ -28,7 +42,7 @@ echo ╠════════════════════════
 echo ║  Status: STARTING                                         ║
 echo ║  Features:                                                ║
 echo ║  - Real data dashboard with 57,234 shipments              ║
-echo ║  - Live alert system (6 real alerts)                      ║
+echo ║  - Live alert system                                      ║
 echo ║  - Regional performance analytics                         ║
 echo ║  - Advanced shipment search                               ║
 echo ║  Opens automatically in your default browser              ║

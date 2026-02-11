@@ -6,6 +6,32 @@ import { trackingService } from '../services/api';
 
 mapboxgl.accessToken = '***REMOVED***';
 
+// Helper function to safely extract coordinates in [lng, lat] format
+const getCoordinates = (locationObj) => {
+  if (!locationObj) return null;
+  
+  // If it's already an array [lng, lat]
+  if (Array.isArray(locationObj)) {
+    return locationObj.length === 2 ? locationObj : null;
+  }
+  
+  // If it's an object with lng/lat or lon/lat
+  if (typeof locationObj === 'object') {
+    if ('lng' in locationObj && 'lat' in locationObj) {
+      return [locationObj.lng, locationObj.lat];
+    }
+    if ('lon' in locationObj && 'lat' in locationObj) {
+      return [locationObj.lon, locationObj.lat];
+    }
+    // If it has coordinates property
+    if ('coordinates' in locationObj && Array.isArray(locationObj.coordinates)) {
+      return locationObj.coordinates.length === 2 ? locationObj.coordinates : null;
+    }
+  }
+  
+  return null;
+};
+
 function GeospatialMap({ awb, telemetry }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -161,6 +187,9 @@ function GeospatialMap({ awb, telemetry }) {
       // Add scan location markers
       if (routeData.scanLocations) {
         routeData.scanLocations.forEach((location, index) => {
+          const coords = getCoordinates(location);
+          if (!coords) return; // Skip if coordinates invalid
+          
           const el = document.createElement('div');
           el.className = 'scan-marker';
           el.style.backgroundColor = getScanColor(location.type);
@@ -175,7 +204,7 @@ function GeospatialMap({ awb, telemetry }) {
           `);
 
           new mapboxgl.Marker(el)
-            .setLngLat(location.coordinates)
+            .setLngLat(coords)
             .setPopup(popup)
             .addTo(map.current);
         });
@@ -183,36 +212,42 @@ function GeospatialMap({ awb, telemetry }) {
 
       // Add origin marker
       if (routeData.origin) {
-        const originEl = document.createElement('div');
-        originEl.className = 'origin-marker';
-        originEl.innerHTML = '<span class="material-icons">flight_takeoff</span>';
+        const originCoords = getCoordinates(routeData.origin);
+        if (originCoords) {
+          const originEl = document.createElement('div');
+          originEl.className = 'origin-marker';
+          originEl.innerHTML = '<span class="material-icons">flight_takeoff</span>';
 
-        new mapboxgl.Marker(originEl)
-          .setLngLat(routeData.origin.coordinates)
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <div class="location-popup">
-              <strong>Origin</strong>
-              <p>${routeData.origin.city}, ${routeData.origin.country}</p>
-            </div>
-          `))
-          .addTo(map.current);
+          new mapboxgl.Marker(originEl)
+            .setLngLat(originCoords)
+            .setPopup(new mapboxgl.Popup().setHTML(`
+              <div class="location-popup">
+                <strong>Origin</strong>
+                <p>${routeData.origin.city || 'Origin'}, ${routeData.origin.country || ''}</p>
+              </div>
+            `))
+            .addTo(map.current);
+        }
       }
 
       // Add destination marker
       if (routeData.destination) {
-        const destEl = document.createElement('div');
-        destEl.className = 'destination-marker';
-        destEl.innerHTML = '<span class="material-icons">flag</span>';
+        const destCoords = getCoordinates(routeData.destination);
+        if (destCoords) {
+          const destEl = document.createElement('div');
+          destEl.className = 'destination-marker';
+          destEl.innerHTML = '<span class="material-icons">flag</span>';
 
-        new mapboxgl.Marker(destEl)
-          .setLngLat(routeData.destination.coordinates)
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <div class="location-popup">
-              <strong>Destination</strong>
-              <p>${routeData.destination.city}, ${routeData.destination.country}</p>
-            </div>
-          `))
-          .addTo(map.current);
+          new mapboxgl.Marker(destEl)
+            .setLngLat(destCoords)
+            .setPopup(new mapboxgl.Popup().setHTML(`
+              <div class="location-popup">
+                <strong>Destination</strong>
+                <p>${routeData.destination.city || 'Destination'}, ${routeData.destination.country || ''}</p>
+              </div>
+            `))
+            .addTo(map.current);
+        }
       }
 
       // Fit bounds to show all markers
@@ -232,15 +267,18 @@ function GeospatialMap({ awb, telemetry }) {
   useEffect(() => {
     if (!map.current || !gpsPosition) return;
 
+    const courierCoords = getCoordinates(gpsPosition);
+    if (!courierCoords) return;
+
     if (courierMarker.current) {
-      courierMarker.current.setLngLat(gpsPosition.coordinates);
+      courierMarker.current.setLngLat(courierCoords);
     } else {
       const courierEl = document.createElement('div');
       courierEl.className = 'courier-marker';
       courierEl.innerHTML = '<span class="material-icons">local_shipping</span>';
 
       courierMarker.current = new mapboxgl.Marker(courierEl)
-        .setLngLat(gpsPosition.coordinates)
+        .setLngLat(courierCoords)
         .setPopup(new mapboxgl.Popup().setHTML(`
           <div class="courier-popup">
             <strong>Courier Position</strong>

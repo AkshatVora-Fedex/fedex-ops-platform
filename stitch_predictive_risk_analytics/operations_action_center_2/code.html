@@ -71,7 +71,7 @@
 <div class="text-text-secondary flex items-center justify-center pl-3 pr-2">
 <span class="material-symbols-outlined text-[20px]">search</span>
 </div>
-<input class="w-full bg-transparent border-none text-sm text-white focus:ring-0 placeholder:text-text-secondary" placeholder="Search AWB, Flight #, or Location ID"/>
+<input class="w-full bg-transparent border-none text-sm text-white focus:ring-0 placeholder:text-text-secondary" aria-label="Search AWB, Flight #, or Location ID" placeholder="Search AWB, Flight #, or Location ID" type="text"/>
 </div>
 </div>
 </div>
@@ -288,7 +288,7 @@
 <div class="space-y-1">
 <label class="text-sm text-text-secondary">Reason Code</label>
 <div class="relative">
-<select class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
+<select title="Select reason code for the corrective action" class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
 <option>SORT_ERR_01 (Sortation Error)</option>
 <option>LBL_DMG_04 (Label Damaged)</option>
 <option>FLT_CNCL_02 (Flight Cancellation)</option>
@@ -299,7 +299,7 @@
 <div class="space-y-1">
 <label class="text-sm text-text-secondary">New Destination Hub</label>
 <div class="relative">
-<select class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
+<select title="Select new destination hub for the package" class="w-full bg-[#141118] border border-surface-border rounded-lg text-white text-sm focus:ring-1 focus:ring-primary focus:border-primary py-2.5 pl-3 pr-10 appearance-none">
 <option>MEM (Memphis SuperHub)</option>
 <option>IND (Indianapolis)</option>
 <option>CDG (Paris Charles de Gaulle)</option>
@@ -390,7 +390,7 @@
 <!-- Quick Add Note -->
 <div class="p-3 border-t border-surface-border bg-[#141118] rounded-b-xl">
 <div class="flex gap-2">
-<input class="w-full bg-surface-dark border-none rounded text-xs text-white placeholder:text-text-secondary/50 focus:ring-1 focus:ring-primary" placeholder="Quick note..."/>
+<input class="w-full bg-surface-dark border-none rounded text-xs text-white placeholder:text-text-secondary/50 focus:ring-1 focus:ring-primary" aria-label="Quick note" placeholder="Quick note..." type="text"/>
 <button class="text-primary hover:text-white p-1 rounded hover:bg-surface-border transition-colors">
 <span class="material-symbols-outlined text-[18px]">send</span>
 </button>

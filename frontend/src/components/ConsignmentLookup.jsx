@@ -273,7 +273,7 @@ const ConsignmentLookup = () => {
                       </span>
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                      {sample.origin || 'Unknown'} → {sample.destination || 'Unknown'}
+                      {formatLocation(sample.origin)} → {formatLocation(sample.destination)}
                     </div>
                   </button>
                 ))
@@ -363,7 +363,7 @@ const ConsignmentLookup = () => {
                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 w-32">Current Location:</dt>
                     <dd className="text-sm text-gray-900 dark:text-white font-semibold flex items-center">
                       <span className="material-icons text-blue-600 text-sm mr-1">location_on</span>
-                      {consignment?.currentLocation || 'Unknown'}
+                      {formatLocation(consignment?.currentLocation)}
                     </dd>
                   </div>
                 </dl>
