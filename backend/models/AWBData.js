@@ -72,13 +72,11 @@ class AWBData {
         ? historical.service?.type || 'Priority'
         : historical.service || 'Priority';
 
-      const originLocation = historical.origin?.mdName ||
-        historical.origin?.locationCode ||
+      const originLocation = historical.origin?.locationCode ||
         historical.origin?.postalCode ||
         'Unknown';
 
-      const destinationLocation = historical.destination?.mdName ||
-        historical.destination?.locationCode ||
+      const destinationLocation = historical.destination?.locationCode ||
         historical.destination?.postalCode ||
         'Unknown';
 
@@ -125,11 +123,11 @@ class AWBData {
         ? historical.service?.type || 'Priority'
         : historical.service || 'Priority';
         
-      const originLocation = historical.origin?.mdName || 
-                            historical.origin?.locationCode || 
+      const originLocation = historical.origin?.locationCode || 
+                            historical.origin?.postalCode || 
                             'Unknown';
-      const destLocation = historical.destination?.mdName || 
-                          historical.destination?.locationCode || 
+      const destLocation = historical.destination?.locationCode || 
+                          historical.destination?.postalCode || 
                           'Unknown';
       
       return {
@@ -529,12 +527,12 @@ class AWBData {
       deliveryDate: record.deliveryDate,
       status: currentStatus,
       origin: {
-        location: record.origin?.mdName || record.origin?.locationCode,
+        location: record.origin?.locationCode || record.origin?.postalCode,
         address: record.origin?.address,
         coordinates: { lat: record.origin?.latitude, lng: record.origin?.longitude }
       },
       destination: {
-        location: record.destination?.mdName || record.destination?.locationCode,
+        location: record.destination?.locationCode || record.destination?.postalCode,
         address: record.destination?.address,
         coordinates: { lat: record.destination?.latitude, lng: record.destination?.longitude }
       },

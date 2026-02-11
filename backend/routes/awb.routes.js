@@ -37,12 +37,14 @@ router.post('/register', (req, res) => {
 // Get unique LOC IDs (locations) for filtering
 router.get('/filters/locations', async (req, res) => {
   try {
-    const allConsignments = await AWBData.getAllConsignments();
+    const { loadHistoricalData } = require('../models/AWBData');
+    const data = await loadHistoricalData();
     const locations = new Set();
     
-    allConsignments.forEach(c => {
-      if (c.origin) locations.add(c.origin);
-      if (c.destination) locations.add(c.destination);
+    data.forEach(record => {
+      // Extract only location codes (meaningful identifiers), not manager names
+      if (record.origin?.locationCode) locations.add(record.origin.locationCode);
+      if (record.destination?.locationCode) locations.add(record.destination.locationCode);
     });
     
     res.json({

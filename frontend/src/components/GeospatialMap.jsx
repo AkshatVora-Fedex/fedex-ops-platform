@@ -14,8 +14,9 @@ function GeospatialMap({ awb, telemetry }) {
   const [lat, setLat] = useState(35.149534);
   const [zoom, setZoom] = useState(9);
   const [routeData, setRouteData] = useState(null);
+  const [gpsPosition, setGpsPosition] = useState(null);
 
-  // Use telemetry data for route if available
+  // Use telemetry data for route and GPS position if available
   useEffect(() => {
     if (telemetry?.routeData) {
       setRouteData(telemetry.routeData);
@@ -24,13 +25,39 @@ function GeospatialMap({ awb, telemetry }) {
         setLat(telemetry.routeData.origin.lat);
         setLng(telemetry.routeData.origin.lng);
       }
-    } else if (awb) {
+    }
+    
+    // Extract GPS position (latest scan location or current position)
+    if (telemetry?.scanTimeline && telemetry.scanTimeline.length > 0) {
+      const latestScan = telemetry.scanTimeline[telemetry.scanTimeline.length - 1];
+      if (latestScan.location?.coordinates) {
+        setGpsPosition({
+          coordinates: latestScan.location.coordinates,
+          timestamp: latestScan.timestamp,
+          driver: latestScan.driver || 'N/A',
+          speed: 0
+        });
+      }
+    }
+    
+    if (awb && !routeData) {
       // Fallback to fetching telemetry if not provided
       const fetchRouteData = async () => {
         try {
           const telemetryRes = await trackingService.getTelemetry(awb);
           if (telemetryRes.data?.data?.routeData) {
             setRouteData(telemetryRes.data.data.routeData);
+          }
+          if (telemetryRes.data?.data?.scanTimeline) {
+            const latestScan = telemetryRes.data.data.scanTimeline[telemetryRes.data.data.scanTimeline.length - 1];
+            if (latestScan?.location?.coordinates) {
+              setGpsPosition({
+                coordinates: latestScan.location.coordinates,
+                timestamp: latestScan.timestamp,
+                driver: latestScan.driver || 'N/A',
+                speed: 0
+              });
+            }
           }
         } catch (error) {
           console.error('Error fetching route data:', error);
