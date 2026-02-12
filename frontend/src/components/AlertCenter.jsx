@@ -1,5 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { alertService, awbService } from '../services/api';
+
+// Restore formatValue for generic value rendering
+const formatValue = (value) => {
+  if (value === null || value === undefined || value === '') return 'N/A';
+  return value;
+};
 
 const AlertCenter = () => {
   const [alerts, setAlerts] = useState([]);
@@ -106,9 +113,14 @@ const AlertCenter = () => {
     return parsed.toLocaleString();
   };
 
-  const formatValue = (value) => {
-    if (value === null || value === undefined || value === '') return 'N/A';
-    return value;
+  const formatParty = (party) => {
+    if (!party) return 'Unknown';
+    if (typeof party === 'string') return party;
+    if (typeof party === 'object') {
+      if (party.companyName) return party.companyName;
+      return 'Unknown';
+    }
+    return 'Unknown';
   };
 
   const formatLocation = (location) => {
@@ -496,11 +508,11 @@ const AlertCenter = () => {
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Shipper</span>
-                          <span className="font-bold text-gray-900 dark:text-white">{formatValue(selectedConsignment?.shipper)}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{formatParty(selectedConsignment?.shipper)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600 dark:text-gray-400">Receiver</span>
-                          <span className="font-bold text-gray-900 dark:text-white">{formatValue(selectedConsignment?.receiver)}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{formatParty(selectedConsignment?.receiver)}</span>
                         </div>
                       </div>
                     </div>

@@ -41,6 +41,38 @@ function GeospatialMap({ awb, telemetry }) {
   const [zoom, setZoom] = useState(9);
   const [routeData, setRouteData] = useState(null);
   const [gpsPosition, setGpsPosition] = useState(null);
+  const [showAllScans, setShowAllScans] = useState(true); // Toggle for scan marker filtering
+  // Helper to filter scan locations for key events only
+  const filterKeyEvents = (scanLocations) => {
+    if (!Array.isArray(scanLocations)) return [];
+    // Define major hub types (customize as needed)
+    const majorTypes = ['HEX', 'STAT', 'REX', 'SEP', 'CONS', 'DDEX'];
+    return scanLocations.filter(loc => majorTypes.includes(loc.type));
+  };
+
+  const normalizeRoute = (route) => {
+    if (!Array.isArray(route)) return [];
+    return route.map(getCoordinates).filter(Boolean);
+  };
+
+  const buildPlannedRoute = (data) => {
+    if (!data) return [];
+    const origin = getCoordinates(data.origin);
+    const destination = getCoordinates(data.destination);
+    const waypointCoords = Array.isArray(data.waypoints)
+      ? data.waypoints.map(getCoordinates).filter(Boolean)
+      : [];
+    return [origin, ...waypointCoords, destination].filter(Boolean);
+  };
+
+  const buildActualRoute = (data, fallback) => {
+    if (!data) return [];
+    if (Array.isArray(data.scanLocations) && data.scanLocations.length > 0) {
+      const scanCoords = data.scanLocations.map(getCoordinates).filter(Boolean);
+      if (scanCoords.length > 0) return scanCoords;
+    }
+    return fallback;
+  };
 
   // Use telemetry data for route and GPS position if available
   useEffect(() => {
@@ -48,17 +80,21 @@ function GeospatialMap({ awb, telemetry }) {
       setRouteData(telemetry.routeData);
       // Center map on origin
       if (telemetry.routeData.origin) {
-        setLat(telemetry.routeData.origin.lat);
-        setLng(telemetry.routeData.origin.lng);
+        const originCoords = getCoordinates(telemetry.routeData.origin);
+        if (originCoords) {
+          setLng(originCoords[0]);
+          setLat(originCoords[1]);
+        }
       }
     }
     
     // Extract GPS position (latest scan location or current position)
     if (telemetry?.scanTimeline && telemetry.scanTimeline.length > 0) {
       const latestScan = telemetry.scanTimeline[telemetry.scanTimeline.length - 1];
-      if (latestScan.location?.coordinates) {
+      const scanCoords = getCoordinates(latestScan.location);
+      if (scanCoords) {
         setGpsPosition({
-          coordinates: latestScan.location.coordinates,
+          coordinates: scanCoords,
           timestamp: latestScan.timestamp,
           driver: latestScan.driver || 'N/A',
           speed: 0
@@ -76,9 +112,10 @@ function GeospatialMap({ awb, telemetry }) {
           }
           if (telemetryRes.data?.data?.scanTimeline) {
             const latestScan = telemetryRes.data.data.scanTimeline[telemetryRes.data.data.scanTimeline.length - 1];
-            if (latestScan?.location?.coordinates) {
+            const scanCoords = getCoordinates(latestScan?.location);
+            if (scanCoords) {
               setGpsPosition({
-                coordinates: latestScan.location.coordinates,
+                coordinates: scanCoords,
                 timestamp: latestScan.timestamp,
                 driver: latestScan.driver || 'N/A',
                 speed: 0
@@ -123,78 +160,105 @@ function GeospatialMap({ awb, telemetry }) {
   // Draw route and markers
   useEffect(() => {
     if (!map.current || !routeData) return;
+    const drawRoute = () => {
+      const plannedCoords = normalizeRoute(routeData.plannedRoute).length > 0
+        ? normalizeRoute(routeData.plannedRoute)
+        : buildPlannedRoute(routeData);
+      const actualCoords = normalizeRoute(routeData.actualRoute).length > 0
+        ? normalizeRoute(routeData.actualRoute)
+        : buildActualRoute(routeData, plannedCoords);
 
-    map.current.on('load', () => {
       // Add planned route layer
-      if (routeData.plannedRoute && !map.current.getSource('planned-route')) {
-        map.current.addSource('planned-route', {
-          type: 'geojson',
-          data: {
+      if (plannedCoords.length > 0) {
+        if (!map.current.getSource('planned-route')) {
+          map.current.addSource('planned-route', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: plannedCoords
+              }
+            }
+          });
+
+          map.current.addLayer({
+            id: 'planned-route-layer',
+            type: 'line',
+            source: 'planned-route',
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#4D148C',
+              'line-width': 4,
+              'line-dasharray': [2, 2]
+            }
+          });
+        } else {
+          map.current.getSource('planned-route').setData({
             type: 'Feature',
             properties: {},
             geometry: {
               type: 'LineString',
-              coordinates: routeData.plannedRoute
+              coordinates: plannedCoords
             }
-          }
-        });
-
-        map.current.addLayer({
-          id: 'planned-route-layer',
-          type: 'line',
-          source: 'planned-route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#4D148C',
-            'line-width': 4,
-            'line-dasharray': [2, 2]
-          }
-        });
+          });
+        }
       }
 
       // Add actual route (GPS breadcrumb)
-      if (routeData.actualRoute && !map.current.getSource('actual-route')) {
-        map.current.addSource('actual-route', {
-          type: 'geojson',
-          data: {
+      if (actualCoords.length > 0) {
+        if (!map.current.getSource('actual-route')) {
+          map.current.addSource('actual-route', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: actualCoords
+              }
+            }
+          });
+
+          map.current.addLayer({
+            id: 'actual-route-layer',
+            type: 'line',
+            source: 'actual-route',
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#FF6600',
+              'line-width': 3
+            }
+          });
+        } else {
+          map.current.getSource('actual-route').setData({
             type: 'Feature',
             properties: {},
             geometry: {
               type: 'LineString',
-              coordinates: routeData.actualRoute
+              coordinates: actualCoords
             }
-          }
-        });
-
-        map.current.addLayer({
-          id: 'actual-route-layer',
-          type: 'line',
-          source: 'actual-route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#FF6600',
-            'line-width': 3
-          }
-        });
+          });
+        }
       }
 
-      // Add scan location markers
+      // Add scan location markers (filtered by toggle)
       if (routeData.scanLocations) {
-        routeData.scanLocations.forEach((location, index) => {
+        const scanList = showAllScans ? routeData.scanLocations : filterKeyEvents(routeData.scanLocations);
+        scanList.forEach((location) => {
           const coords = getCoordinates(location);
-          if (!coords) return; // Skip if coordinates invalid
-          
+          if (!coords) return;
           const el = document.createElement('div');
           el.className = 'scan-marker';
           el.style.backgroundColor = getScanColor(location.type);
           el.innerHTML = `<span class="material-icons">${getScanIcon(location.type)}</span>`;
-
           const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div class="scan-popup">
               <strong>${location.code}</strong>
@@ -202,7 +266,6 @@ function GeospatialMap({ awb, telemetry }) {
               <p class="scan-time">${location.timestamp}</p>
             </div>
           `);
-
           new mapboxgl.Marker(el)
             .setLngLat(coords)
             .setPopup(popup)
@@ -251,16 +314,22 @@ function GeospatialMap({ awb, telemetry }) {
       }
 
       // Fit bounds to show all markers
-      if (routeData.plannedRoute && routeData.plannedRoute.length > 0) {
-        const bounds = routeData.plannedRoute.reduce((bounds, coord) => {
+      if (plannedCoords.length > 0) {
+        const bounds = plannedCoords.reduce((bounds, coord) => {
           return bounds.extend(coord);
-        }, new mapboxgl.LngLatBounds(routeData.plannedRoute[0], routeData.plannedRoute[0]));
+        }, new mapboxgl.LngLatBounds(plannedCoords[0], plannedCoords[0]));
 
         map.current.fitBounds(bounds, {
           padding: 50
         });
       }
-    });
+    };
+
+    if (map.current.loaded()) {
+      drawRoute();
+    } else {
+      map.current.once('load', drawRoute);
+    }
   }, [routeData]);
 
   // Update courier position
@@ -339,6 +408,16 @@ function GeospatialMap({ awb, telemetry }) {
             <div className="legend-marker courier"></div>
             <span>Courier Position</span>
           </div>
+        </div>
+        <div className="scan-toggle">
+          <label>
+            <input
+              type="checkbox"
+              checked={showAllScans}
+              onChange={() => setShowAllScans((v) => !v)}
+            />
+            {showAllScans ? 'Show All Scans' : 'Show Key Events Only'}
+          </label>
         </div>
       </div>
       <div ref={mapContainer} className="map-canvas" />
