@@ -76,9 +76,9 @@ router.get('/analytics/all-predictions', async (req, res) => {
       totalPages: Math.ceil(totalCount / limit),
       data: {
         total: predictions.length,
-        atRisk: atRi***REMOVED***length,
+        atRisk: atRisk.length,
         riskPercentage: predictions.length
-          ? ((atRi***REMOVED***length / predictions.length) * 100).toFixed(1)
+          ? ((atRisk.length / predictions.length) * 100).toFixed(1)
           : '0.0',
         predictions
       }

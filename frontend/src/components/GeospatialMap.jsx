@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import '../styles/GeospatialMap.css';
 import { trackingService } from '../services/api';
 
-mapboxgl.accessToken = '***REMOVED***';
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 // Helper function to safely extract coordinates in [lng, lat] format
 const getCoordinates = (locationObj) => {
